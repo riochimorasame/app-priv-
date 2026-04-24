@@ -1,0 +1,122 @@
+rules_version = '2';
+
+// ══════════════════════════════════════════════════════════════
+// RÈGLES DE SÉCURITÉ FIRESTORE — InvestPro
+// Projet : mon-app-priv
+// ══════════════════════════════════════════════════════════════
+//
+// Architecture :
+//   users/{userId}/assets/{docId}
+//   users/{userId}/transactions/{docId}
+//   users/{userId}/alerts/{docId}
+//   users/{userId}/objectifs/{docId}
+//   users/{userId}/notifications/{docId}
+//
+// Principe : chaque utilisateur ne peut lire/écrire QUE
+//            ses propres données (isolation totale).
+// ══════════════════════════════════════════════════════════════
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Fonctions utilitaires ──────────────────────────────────
+
+    // L'utilisateur est authentifié
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // L'utilisateur accède à SES propres données
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+
+    // ── Document utilisateur racine ────────────────────────────
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // ── ASSETS ────────────────────────────────────────────────
+      // Champs attendus : sym, name, type, color, value, cost, change
+      match /assets/{assetId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['sym', 'name', 'type', 'value', 'cost'])
+          && request.resource.data.value is number
+          && request.resource.data.cost  is number;
+
+        allow update: if isOwner(userId)
+          && request.resource.data.keys().hasAny(['value', 'change', 'sym', 'name', 'type', 'color', 'cost']);
+
+        allow delete: if isOwner(userId);
+      }
+
+      // ── TRANSACTIONS ───────────────────────────────────────────
+      // Champs attendus : type (buy|sell|div|dep), asset, amount, qty, date, note
+      match /transactions/{txId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['type', 'asset', 'amount', 'date'])
+          && request.resource.data.type in ['buy', 'sell', 'div', 'dep']
+          && request.resource.data.amount is number
+          && request.resource.data.amount >= 0;
+
+        allow update: if isOwner(userId);
+
+        allow delete: if isOwner(userId);
+      }
+
+      // ── ALERTES ────────────────────────────────────────────────
+      // Champs attendus : asset, cond, val, active
+      match /alerts/{alertId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['asset', 'cond', 'val', 'active'])
+          && request.resource.data.active is bool
+          && request.resource.data.val    is number;
+
+        allow update: if isOwner(userId)
+          && request.resource.data.keys().hasAny(['active', 'val', 'cond']);
+
+        allow delete: if isOwner(userId);
+      }
+
+      // ── OBJECTIFS ──────────────────────────────────────────────
+      // Champs attendus : name, target, current, date, color
+      match /objectifs/{objId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['name', 'target', 'current', 'date'])
+          && request.resource.data.target  is number
+          && request.resource.data.current is number
+          && request.resource.data.target  > 0;
+
+        allow update: if isOwner(userId);
+
+        allow delete: if isOwner(userId);
+      }
+
+      // ── NOTIFICATIONS ──────────────────────────────────────────
+      // Champs attendus : type (green|red|amber|blue), cat, msg, time
+      match /notifications/{notifId} {
+        allow read: if isOwner(userId);
+
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['type', 'cat', 'msg', 'time'])
+          && request.resource.data.type in ['green', 'red', 'amber', 'blue'];
+
+        allow update: if isOwner(userId);
+
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // ── Bloquer tout le reste ──────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

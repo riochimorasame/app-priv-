@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "mon-app-priv"
+  },
+  "targets": {},
+  "etags": {}
+}
