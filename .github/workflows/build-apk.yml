@@ -38,9 +38,13 @@ jobs:
           npx cap add android
           npx cap copy android
 
-   - name: Upload APK
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+     - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: InvestPro-APK
-          # On utilise un joker (**) pour trouver l'APK peu importe le nom du dossier
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: "android/app/build/outputs/apk/debug/*.apk"
