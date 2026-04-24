@@ -1,17 +1,11 @@
 name: Build InvestPro APK
-
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -19,12 +13,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Install Dependencies
         run: |
           npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Build Web App
+        run: |
+          # Crée un dossier www si nécessaire pour éviter les erreurs Capacitor
+          mkdir -p www
+          cp index.html www/
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -32,20 +32,18 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Initialize Capacitor Android
+      - name: Capacitor Android Sync
         run: |
-          npx cap init InvestPro com.investpro.app --web-dir .
+          npx cap init InvestPro com.doanyon.investpro --web-dir .
           npx cap add android
+          npx cap copy android
 
-      - name: Build Android Project
-        run: npx cap copy android
-
-      - name: Build APK with Gradle
+      - name: Build APK
         run: |
           cd android
           ./gradlew assembleDebug
 
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: InvestPro-APK
