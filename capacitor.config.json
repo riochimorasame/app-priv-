@@ -1,0 +1,6 @@
+{
+  "appId": "com.doanyon.investpro",
+  "appName": "InvestPro",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

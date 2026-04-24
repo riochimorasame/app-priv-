@@ -38,8 +38,9 @@ jobs:
           npx cap add android
           npx cap copy android
 
-     - name: Upload APK
+   - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: InvestPro-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          # On utilise un joker (**) pour trouver l'APK peu importe le nom du dossier
+          path: android/app/build/outputs/apk/debug/*.apk
