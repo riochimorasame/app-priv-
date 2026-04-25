@@ -1,6 +1,13 @@
 {
-  "appId": "com.doanyon.investpro",
+  "appId": "com.investpro.app",
   "appName": "InvestPro",
-  "webDir": "www",
-  "bundledWebRuntime": false
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#0a0b0e"
+  }
 }
