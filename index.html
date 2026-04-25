@@ -573,6 +573,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         <span class="hicon">🕐</span>
         <div>Retrouve ici <strong>tout ce que tu as fait</strong> depuis le début. Tu peux filtrer par type de mouvement.</div>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <p style="font-size:13px;color:var(--text2);">Tous tes mouvements depuis le début</p>
+        <button class="btn btn-sm btn-secondary" onclick="exportCSV()">⬇ Exporter CSV</button>
+      </div>
       <div class="card">
         <div class="card-title">HISTORIQUE COMPLET</div>
         <div class="history-filters">
@@ -633,7 +637,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <section class="section" id="sec-alertes">
       <div class="help-banner">
         <span class="hicon">🔔</span>
-        <div>Une <strong>alerte</strong> te permet de noter à quel prix tu voudrais acheter ou vendre. C'est un <strong>mémo</strong> pour ne pas oublier tes objectifs de prix.</div>
+        <div>Une <strong>alerte</strong> te permet de noter à quel prix tu voudrais acheter ou vendre. C'est un <strong>mémo personnel</strong> — tu dois vérifier les prix toi-même sur la BRVM et activer/désactiver l'alerte manuellement. <strong>Pas de notification automatique.</strong></div>
+      </div>
+      <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--amber);display:flex;gap:8px;align-items:flex-start;">
+        <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+        <div>Les alertes sont des <strong>rappels manuels</strong>. L'application n'est pas connectée aux prix en temps réel de la BRVM. Vérifie les cours sur <strong>brvm.org</strong> puis marque ton alerte comme atteinte.</div>
       </div>
       <div class="card" style="margin-bottom:14px;">
         <div class="card-title">CRÉER UNE ALERTE DE PRIX</div>
@@ -887,6 +895,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </div>
 
+<!-- MODAL UPDATE PRICE -->
+<div class="modal-overlay" id="modal-update-price">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="modal-title">Mettre à jour le prix</div>
+      <button onclick="closeUpdatePriceModal()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;">✕</button>
+    </div>
+    <div class="modal-subtitle" id="upd-asset-name" style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;"></div>
+    <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:16px;">
+      📊 Vérifie le prix actuel sur <strong>brvm.org</strong> puis entre-le ici.
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nouvelle valeur (F CFA)</label>
+        <input type="number" class="form-input" id="upd-price-val" id="upd-current-val" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Variation % (ex: 3.5 ou -1.2)</label>
+        <input type="number" class="form-input" id="upd-change-input" id="upd-change-val" placeholder="" step="0.1">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px;" id="save-update-price-btn" onclick="saveUpdatedPrice()">✅ Mettre à jour</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"><div class="toast-dot" id="toast-dot"></div><span id="toast-msg"></span></div>
 
@@ -923,6 +956,9 @@ function obSkip() {
 }
 
 // ══ FIREBASE CONFIG ══════════════════════════════════════════════
+// ⚠️ SÉCURITÉ : Configurer les règles Firestore dans Firebase Console :
+// Règle recommandée : allow read, write: if request.auth != null && request.auth.uid == resource.data.uid;
+// Restreindre aussi la clé API dans Google Cloud Console → API & Services → Credentials
 const firebaseConfig = {
   apiKey: "AIzaSyDhIWe0c0ZkMbvMAi5I_U-9TJ_FNa_NRCc",
   authDomain: "mon-app-priv.firebaseapp.com",
@@ -1024,8 +1060,16 @@ async function fsUpdate(c,id,data) { await col(c).doc(id).update(data); }
 async function fsDelete(c,id) { await col(c).doc(id).delete(); }
 
 async function loadUserData() {
-  const [a,t,al,o,n] = await Promise.all([fsGet('assets'),fsGet('transactions'),fsGet('alerts'),fsGet('objectifs'),fsGet('notifications')]);
-  state = { assets:a, transactions:t, alerts:al, objectifs:o, notifications:n };
+  try {
+    const [a,t,al,o,n] = await Promise.all([fsGet('assets'),fsGet('transactions'),fsGet('alerts'),fsGet('objectifs'),fsGet('notifications')]);
+    state = { assets:a, transactions:t, alerts:al, objectifs:o, notifications:n };
+  } catch(e) {
+    console.error('Erreur chargement données:', e);
+    if (e.code === 'unavailable' || e.message?.includes('network')) {
+      throw new Error('Hors-ligne. Vérifie ta connexion internet et réessaie.');
+    }
+    throw e;
+  }
 }
 
 // ══ INIT ══════════════════════════════════════════════════════════
@@ -1033,6 +1077,9 @@ function initApp() {
   document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
   renderDashboard();
   renderNotifications();
+  // Détection hors-ligne
+  window.addEventListener('offline', ()=>showToast('⚠️ Hors-ligne — les modifications ne seront pas sauvegardées','amber'));
+  window.addEventListener('online', ()=>showToast('✅ Connexion rétablie','green'));
 }
 
 // ══ PAGE TITLES ═══════════════════════════════════════════════════
@@ -1153,8 +1200,19 @@ function drawEvolChart() {
   const months = [];
   const now = new Date();
   for (let i=5;i>=0;i--) { const d=new Date(now.getFullYear(),now.getMonth()-i,1); months.push(d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase()); }
-  const total = state.assets.reduce((s,a)=>s+a.value,0);
-  const data  = months.map((_,i)=>i===5?total:Math.round(total*(0.92+i*0.016)));
+  // Calcul réel basé sur les transactions (cumul des achats - ventes par mois)
+  const now2 = new Date();
+  const data = months.map((_,i)=>{
+    const cutoff = new Date(now2.getFullYear(), now2.getMonth()-(5-i)+1, 1);
+    const bought = state.transactions.filter(t=>t.type==='buy'&&new Date(t.date)<cutoff).reduce((s,t)=>s+t.amount,0);
+    const sold = state.transactions.filter(t=>t.type==='sell'&&new Date(t.date)<cutoff).reduce((s,t)=>s+t.amount,0);
+    const base = bought - sold;
+    // Si pas de transactions, on utilise la valeur actuelle comme référence
+    return base > 0 ? base : (i===5 ? state.assets.reduce((s,a)=>s+a.value,0) : 0);
+  });
+  // Si aucune transaction, on affiche quand même la valeur actuelle
+  const totalNow = state.assets.reduce((s,a)=>s+a.value,0);
+  if (data.every(v=>v===0) && totalNow>0) data[5] = totalNow;
   evolChartInst = new Chart(ctx,{ type:'line', data:{labels:months,datasets:[{data,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.06)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#4ade80',borderWidth:2}]}, options:{...cDef,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'}}}} });
 }
 
@@ -1198,7 +1256,7 @@ function renderAssets() {
       <td><button class="btn btn-sm btn-secondary" onclick="deleteAsset('${a.id}')" style="font-size:10px;padding:5px 10px;color:var(--red);border-color:rgba(248,113,113,.2);">Supprimer</button></td>
     </tr>`;
   }).join('');
-  cont.innerHTML = `<table class="asset-table"><thead><tr><th>PLACEMENT</th><th>VALEUR ACTUELLE</th><th>GAIN / PERTE</th><th>PROGRESSION</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+  cont.innerHTML = `<table class="asset-table"><thead><tr><th>PLACEMENT</th><th>VALEUR ACTUELLE</th><th><span class="tip" data-tip="Prix de Revient Moyen : le prix moyen auquel tu as acheté ce placement. Calculé depuis tes transactions enregistrées.">PRM ❓</span></th><th>GAIN / PERTE</th><th>PROGRESSION</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function openAddAssetModal() { populateAssetSelects(); document.getElementById('modal-asset').style.display='flex'; }
@@ -1216,7 +1274,8 @@ async function saveAsset() {
   const btn = document.getElementById('save-asset-btn');
   btn.disabled=true; btn.textContent='Enregistrement…';
   try {
-    const data = {sym,name,type,value,cost,change,color};
+    const now = new Date().toISOString();
+    const data = {sym,name,type,value,cost,change,color,updatedAt:now};
     const id   = await fsAdd('assets',data);
     state.assets.push({id,...data});
     closeAssetModal();
@@ -1301,6 +1360,70 @@ function drawFluxChart() {
   const div  = state.transactions.filter(t=>t.type==='div').reduce((s,t)=>s+t.amount,0);
   const dep  = state.transactions.filter(t=>t.type==='dep').reduce((s,t)=>s+t.amount,0);
   fluxChartInst = new Chart(ctx,{ type:'bar', data:{labels:['Achats','Ventes','Bénéfices','Dépôts'],datasets:[{data:[buy,sell,div,dep],backgroundColor:['rgba(96,165,250,.5)','rgba(74,222,128,.5)','rgba(251,191,36,.5)','rgba(167,139,250,.5)'],borderColor:['#60a5fa','#4ade80','#fbbf24','#a78bfa'],borderWidth:1,borderRadius:4}]}, options:{...cDef,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'}}}} });
+}
+
+// ══ EXPORT CSV ═══════════════════════════════════════════════════
+function exportCSV() {
+  if (!state.transactions.length && !state.assets.length) { showToast('Aucune donnée à exporter', 'amber'); return; }
+  const rows = [['TYPE','PLACEMENT','MONTANT (F CFA)','QUANTITÉ','DATE','NOTE']];
+  [...state.transactions].reverse().forEach(t => {
+    rows.push([TX_LABELS[t.type]||t.type, t.asset||'—', t.amount, t.qty||'', t.date||'', t.note||'']);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'InvestPro_Export_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ Export CSV téléchargé !', 'green');
+}
+
+// ══ CALCUL PRM ════════════════════════════════════════════════════
+function calcPRM(assetId) {
+  // Trouve le placement par id
+  const asset = state.assets.find(a=>a.id===assetId);
+  if (!asset) return '—';
+  // Filtre les achats de ce placement
+  const buys = state.transactions.filter(t=>t.type==='buy'&&t.asset===asset.name);
+  if (!buys.length) return asset.cost>0 ? Number(asset.cost).toLocaleString('fr-FR')+' F' : '—';
+  const totalAmt = buys.reduce((s,t)=>s+t.amount,0);
+  const totalQty = buys.reduce((s,t)=>s+(t.qty||0),0);
+  if (totalQty>0) return Math.round(totalAmt/totalQty).toLocaleString('fr-FR')+' F/u';
+  return Math.round(totalAmt/buys.length).toLocaleString('fr-FR')+' F';
+}
+
+// ══ UPDATE PRICE MODAL ════════════════════════════════════════════
+let updatePriceAssetId = null;
+function openUpdatePriceModal(id) {
+  updatePriceAssetId = id;
+  const asset = state.assets.find(a=>a.id===id);
+  if (!asset) return;
+  document.getElementById('upd-asset-name').textContent = asset.name;
+  document.getElementById('upd-current-val').placeholder = 'Valeur actuelle: '+Number(asset.value).toLocaleString('fr-FR')+' F';
+  document.getElementById('upd-change-val').placeholder = 'Variation actuelle: '+asset.change+'%';
+  document.getElementById('upd-price-val').value='';
+  document.getElementById('upd-change-input').value='';
+  document.getElementById('modal-update-price').style.display='flex';
+}
+function closeUpdatePriceModal() { document.getElementById('modal-update-price').style.display='none'; updatePriceAssetId=null; }
+async function saveUpdatedPrice() {
+  if (!updatePriceAssetId) return;
+  const newVal = parseFloat(document.getElementById('upd-price-val').value)||0;
+  const newChg = parseFloat(document.getElementById('upd-change-input').value)||0;
+  if (newVal<=0) { showToast('Entre une valeur valide', 'red'); return; }
+  const btn = document.getElementById('save-update-price-btn');
+  btn.disabled=true; btn.textContent='Mise à jour…';
+  try {
+    const now = new Date().toISOString();
+    await fsUpdate('assets', updatePriceAssetId, {value:newVal, change:newChg, updatedAt:now});
+    const asset = state.assets.find(a=>a.id===updatePriceAssetId);
+    if (asset) { asset.value=newVal; asset.change=newChg; asset.updatedAt=now; }
+    closeUpdatePriceModal();
+    renderDashboard(); renderAssets();
+    showToast('✅ Prix mis à jour !','green');
+  } catch(e) { console.error(e); showToast('Erreur — réessaie','red'); }
+  finally { btn.disabled=false; btn.textContent='✅ Mettre à jour'; }
 }
 
 // ══ HISTORY ══════════════════════════════════════════════════════
@@ -1391,6 +1514,7 @@ async function toggleAlert(id,active) {
   renderAlerts();
 }
 async function deleteAlert(id) {
+  if (!confirm('Supprimer cette alerte ?')) return;
   await fsDelete('alerts',id);
   state.alerts=state.alerts.filter(a=>a.id!==id);
   renderAlerts();
@@ -1476,6 +1600,7 @@ function showToast(msg,type) {
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
 document.getElementById('modal-asset').addEventListener('click',e=>{if(e.target===document.getElementById('modal-asset'))closeAssetModal();});
 document.getElementById('modal-obj').addEventListener('click',e=>{if(e.target===document.getElementById('modal-obj'))closeObjModal();});
+document.getElementById('modal-update-price').addEventListener('click',e=>{if(e.target===document.getElementById('modal-update-price'))closeUpdatePriceModal();});
 </script>
 </body>
 </html>
