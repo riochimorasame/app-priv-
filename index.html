@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>InvestPro — Mon Portefeuille</title>
+<title>InvestPro — Mon Argent</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -22,14 +22,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 ::-webkit-scrollbar-track{background:var(--bg2);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 
+/* ══ TOOLTIP (définitions des mots) ══════════════════════════════ */
+.tip{position:relative;border-bottom:1px dashed var(--text3);cursor:help;}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);white-space:nowrap;max-width:220px;white-space:normal;z-index:999;opacity:0;pointer-events:none;transition:.2s;font-family:var(--fb);line-height:1.4;}
+.tip:hover::after{opacity:1;}
+
+/* ══ ONBOARDING ══════════════════════════════════════════════════ */
+#onboarding{position:fixed;inset:0;background:var(--bg);z-index:2000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;}
+.ob-icon{font-size:52px;margin-bottom:18px;}
+.ob-title{font-family:var(--fh);font-size:24px;font-weight:700;margin-bottom:10px;}
+.ob-desc{color:var(--text2);font-size:15px;max-width:340px;line-height:1.6;margin-bottom:28px;}
+.ob-steps{display:flex;gap:6px;margin-bottom:28px;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg4);transition:.2s;}
+.ob-dot.active{background:var(--accent);width:24px;border-radius:4px;}
+.ob-btn{background:var(--accent);color:#000;font-weight:700;font-family:var(--fh);font-size:15px;border:none;border-radius:12px;padding:14px 32px;cursor:pointer;width:100%;max-width:320px;}
+.ob-skip{margin-top:14px;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--fm);}
+
 /* ══ LOGIN ══════════════════════════════════════════════════════ */
-#login-screen{
-  position:fixed;inset:0;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  z-index:1000;flex-direction:column;padding:24px;
-}
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;padding:24px;}
 .login-logo{font-family:var(--fh);font-size:32px;font-weight:700;text-align:center;margin-bottom:4px;}
 .login-logo span{color:var(--accent);}
+.login-tagline{font-size:13px;color:var(--text2);text-align:center;margin-bottom:6px;}
 .login-sub{font-size:11px;color:var(--text3);font-family:var(--fm);text-align:center;margin-bottom:32px;letter-spacing:.1em;}
 .login-box{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:28px 24px;}
 .login-err{display:none;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px;}
@@ -44,11 +57,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 .app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:56px 1fr;min-height:100vh;}
 
 /* ══ SIDEBAR ════════════════════════════════════════════════════ */
-.sidebar{
-  grid-row:1/3;background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
-  transition:transform .28s cubic-bezier(.4,0,.2,1);
-}
+.sidebar{grid-row:1/3;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;transition:transform .28s cubic-bezier(.4,0,.2,1);}
 .logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
 .logo-mark{font-family:var(--fh);font-size:18px;font-weight:700;}
 .logo-mark span{color:var(--accent);}
@@ -70,11 +79,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 .logout-btn:hover{border-color:var(--red);color:var(--red);}
 
 /* ══ TOPBAR ══════════════════════════════════════════════════════ */
-.topbar{
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:0 24px;height:56px;display:flex;align-items:center;
-  justify-content:space-between;position:sticky;top:0;z-index:50;
-}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
 .topbar-left{display:flex;align-items:center;gap:12px;}
 .page-title{font-family:var(--fh);font-size:16px;font-weight:600;}
 .live-badge{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--accent);font-family:var(--fm);background:rgba(74,222,128,.08);padding:4px 8px;border-radius:4px;border:1px solid rgba(74,222,128,.2);}
@@ -84,16 +89,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 .notif-btn{position:relative;width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .notif-btn:hover{border-color:var(--border2);}
 .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1px solid var(--bg2);}
-
-/* hamburger — hidden on desktop */
 .hamburger{display:none;width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;}
 
 /* ══ MAIN ════════════════════════════════════════════════════════ */
-.main{padding:24px 24px;overflow-y:auto;}
+.main{padding:24px;overflow-y:auto;}
 .section{display:none;}
 .section.active{display:block;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;}
 .card-title{font-size:11px;color:var(--text3);font-family:var(--fm);letter-spacing:.08em;margin-bottom:14px;}
+
+/* ══ HELP BANNER ═════════════════════════════════════════════════ */
+.help-banner{background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text2);line-height:1.5;}
+.help-banner .hicon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.help-banner strong{color:var(--text);}
 
 /* ══ METRICS ════════════════════════════════════════════════════ */
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
@@ -104,7 +112,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 .metric-card.cyan::before{background:var(--cyan);}
 .metric-card.amber::before{background:var(--amber);}
 .metric-card.purple::before{background:var(--purple);}
-.metric-label{font-size:10px;color:var(--text3);font-family:var(--fm);letter-spacing:.06em;margin-bottom:10px;}
+.metric-label{font-size:10px;color:var(--text3);font-family:var(--fm);letter-spacing:.06em;margin-bottom:4px;}
+.metric-label-desc{font-size:10px;color:var(--text3);margin-bottom:6px;font-style:italic;}
 .metric-val{font-family:var(--fh);font-size:22px;font-weight:700;line-height:1;margin-bottom:6px;}
 .metric-val.green{color:var(--accent);}
 .metric-val.cyan{color:var(--cyan);}
@@ -174,7 +183,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
 /* ══ FORMS ═══════════════════════════════════════════════════════ */
 .form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:10px;color:var(--text3);font-family:var(--fm);letter-spacing:.08em;margin-bottom:6px;}
+.form-label{display:block;font-size:11px;color:var(--text2);font-family:var(--fb);margin-bottom:5px;font-weight:500;}
+.form-hint{font-size:11px;color:var(--text3);font-style:italic;margin-bottom:6px;line-height:1.4;}
 .form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--fb);font-size:13px;transition:border-color .15s;outline:none;}
 .form-input:focus{border-color:var(--accent);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -188,7 +198,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px
 
 /* ══ SLIDERS ════════════════════════════════════════════════════ */
 .slider-wrap{margin-bottom:16px;}
-.slider-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;}
+.slider-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+.slider-hint{font-size:11px;color:var(--text3);margin-bottom:6px;font-style:italic;}
 .slider-label span:last-child{color:var(--accent);font-family:var(--fm);}
 input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bg4);outline:none;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--bg2);}
@@ -218,7 +229,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
-.modal-title{font-family:var(--fh);font-size:18px;font-weight:700;}
+.modal-title{font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:4px;}
+.modal-subtitle{font-size:12px;color:var(--text2);margin-bottom:18px;line-height:1.4;}
 .modal-tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--bg3);border-radius:8px;padding:4px;}
 .modal-tab{flex:1;padding:7px;text-align:center;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--fm);color:var(--text3);transition:all .15s;}
 .modal-tab.active{background:var(--bg4);color:var(--text);border:1px solid var(--border2);}
@@ -248,25 +260,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .empty{text-align:center;padding:40px 20px;color:var(--text3);}
 .empty-icon{font-size:32px;margin-bottom:10px;}
 .empty p{font-size:13px;}
+.empty .empty-cta{margin-top:14px;font-size:12px;color:var(--accent);border:1px solid rgba(74,222,128,.3);border-radius:8px;padding:10px 16px;display:inline-block;cursor:pointer;}
 
-/* ══ BOTTOM NAV (mobile only, hidden on desktop) ════════════════ */
+/* ══ BOTTOM NAV ════════════════════════════════════════════════ */
 .bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding-bottom:var(--safe-b);}
 .bnav-inner{display:flex;height:58px;}
 .bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);font-size:9px;font-family:var(--fm);border:none;background:none;padding:6px 4px;transition:color .15s;position:relative;}
 .bnav-item.active{color:var(--accent);}
 .bnav-item svg{width:20px;height:20px;}
 .bnav-item .nav-badge{position:absolute;top:6px;right:18%;font-size:8px;padding:1px 4px;}
-/* More drawer */
 .more-drawer{display:none;position:fixed;bottom:calc(58px + var(--safe-b));left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:99;padding:14px 16px;grid-template-columns:repeat(3,1fr);gap:10px;}
 .more-drawer.open{display:grid;}
 .more-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);cursor:pointer;color:var(--text2);font-size:10px;font-family:var(--fm);text-align:center;transition:all .15s;}
 .more-item.active{color:var(--accent);border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.06);}
 .more-item svg{width:22px;height:22px;}
-/* overlay */
 .drawer-overlay{display:none;position:fixed;inset:0;z-index:98;background:rgba(0,0,0,.5);}
 .drawer-overlay.open{display:block;}
 
-/* ══ RESPONSIVE : TABLET ════════════════════════════════════════ */
+/* ══ RESPONSIVE ════════════════════════════════════════════════ */
 @media(max-width:900px){
   .metrics-grid{grid-template-columns:repeat(2,1fr);}
   .main-grid{grid-template-columns:1fr;}
@@ -274,44 +285,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .calc-grid{grid-template-columns:1fr;}
   .main{padding:18px;}
 }
-
-/* ══ RESPONSIVE : MOBILE ════════════════════════════════════════ */
 @media(max-width:640px){
-  /* layout */
   .app{grid-template-columns:1fr;grid-template-rows:52px 1fr;}
-  .sidebar{
-    position:fixed;top:0;left:0;bottom:0;width:240px;
-    height:100%;z-index:200;transform:translateX(-100%);
-  }
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:240px;height:100%;z-index:200;transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .topbar{padding:0 14px;height:52px;}
   .main{padding:12px 12px 74px;}
-
-  /* topbar */
   .hamburger{display:flex;}
   .date-tag{display:none;}
   .topbar-right .btn{display:none;}
   .page-title{font-size:15px;}
   .live-badge{font-size:9px;padding:3px 6px;}
-
-  /* bottom nav */
   .bottom-nav{display:block;}
-
-  /* metrics */
   .metrics-grid{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
   .metric-card{padding:12px;}
   .metric-val{font-size:18px;}
-  .metric-label{font-size:9px;margin-bottom:6px;}
+  .metric-label{font-size:9px;margin-bottom:3px;}
+  .metric-label-desc{font-size:9px;}
   .metric-trend{font-size:10px;}
-
-  /* grids */
   .main-grid,.chart-grid,.calc-grid{grid-template-columns:1fr;gap:10px;margin-bottom:12px;}
-
-  /* cards */
   .card{padding:14px;border-radius:10px;}
   .card-title{font-size:10px;margin-bottom:10px;}
-
-  /* asset table → card layout */
   .asset-table thead{display:none;}
   .asset-table,.asset-table tbody,.asset-table tr,.asset-table td{display:block;width:100%;}
   .asset-table tr{background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--border);}
@@ -323,8 +317,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .asset-table td:nth-child(5){margin-top:8px;}
   .asset-table td:last-child{text-align:left !important;margin-top:8px;}
   .progress-bar{width:100%;}
-
-  /* history table → card layout */
   .history-table thead{display:none;}
   .history-table,.history-table tbody,.history-table tr,.history-table td{display:block;width:100%;}
   .history-table tr{background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--border);position:relative;}
@@ -334,95 +326,81 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .history-table td:nth-child(3){font-weight:500;font-size:13px;margin-bottom:6px;padding-right:80px;}
   .history-table td:nth-child(4){font-size:13px;font-family:var(--fm);}
   .history-table td:nth-child(5),.history-table td:nth-child(6){font-size:11px;color:var(--text3);}
-
-  /* modal */
   .modal-overlay{align-items:flex-end;padding:0;}
   .modal{border-radius:20px 20px 0 0;padding:22px 18px 30px;max-height:92vh;}
   .form-row{grid-template-columns:1fr;}
-
-  /* notif panel */
   .notif-panel{width:100%;top:52px;border-left:none;border-top:1px solid var(--border);}
-
-  /* portefeuille header */
   #sec-portefeuille>div:first-child{flex-direction:column;align-items:flex-start;gap:8px;}
   #sec-portefeuille .btn{width:100% !important;}
-
-  /* donut */
   .donut-wrap{flex-direction:row;align-items:center;gap:12px;}
   .donut-svg{width:90px;height:90px;flex-shrink:0;margin:0;}
   .donut-legend{flex:1;}
-
-  /* toast */
   .toast{bottom:68px;left:12px;right:12px;transform:translateY(80px);white-space:normal;}
   .toast.show{transform:translateY(0);}
-
-  /* objectifs grid */
   #obj-grid{grid-template-columns:1fr !important;}
-
-  /* alertes/objectifs headers */
-  #sec-alertes>div:first-child,
-  #sec-objectifs>div:first-child,
-  #sec-transactions>div:first-child{flex-direction:column;gap:8px;}
+  #sec-alertes>div:first-child,#sec-objectifs>div:first-child,#sec-transactions>div:first-child{flex-direction:column;gap:8px;}
   #sec-alertes .btn,#sec-objectifs .btn,#sec-transactions .btn{width:100% !important;}
-
-  /* calc result */
   .calc-result-row{font-size:11px;}
   .logo-sub,.profile-role{display:none;}
+  .help-banner{font-size:12px;}
 }
-
-@media(max-width:360px){
-  .metrics-grid{grid-template-columns:1fr;}
-}
+@media(max-width:360px){.metrics-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
+<!-- ══ ONBOARDING ════════════════════════════════════════════════ -->
+<div id="onboarding">
+  <div id="ob-content"></div>
+  <div class="ob-steps" id="ob-dots"></div>
+  <button class="ob-btn" id="ob-next" onclick="obNext()">Suivant →</button>
+  <div class="ob-skip" onclick="obSkip()">Passer le guide</div>
+</div>
+
 <!-- ══ LOGIN ════════════════════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-logo">Invest<span>Pro</span></div>
-  <div class="login-sub">PORTEFEUILLE PRIVÉ · LOMÉ, TOGO</div>
+  <div class="login-tagline">Suis ton argent. Fais-le grandir. 🌱</div>
+  <div class="login-sub">LOMÉ, TOGO · BOURSE BRVM</div>
   <div class="login-box">
     <div class="login-err" id="login-error"></div>
     <div class="form-group">
-      <label class="form-label">EMAIL</label>
-      <input type="email" class="form-input" id="login-email" placeholder="votre@email.com" autocomplete="email">
+      <label class="form-label">Ton adresse email</label>
+      <input type="email" class="form-input" id="login-email" placeholder="exemple@gmail.com" autocomplete="email">
     </div>
     <div class="form-group">
-      <label class="form-label">MOT DE PASSE</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="••••••••" autocomplete="current-password"
-        onkeydown="if(event.key==='Enter')doLogin()">
+      <label class="form-label">Mot de passe</label>
+      <input type="password" class="form-input" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Se connecter</button>
-    <div class="login-switch">Pas de compte ? <a onclick="doRegister()">Créer un compte</a></div>
+    <div class="login-switch">Première fois ? <a onclick="doRegister()">Créer un compte gratuit</a></div>
   </div>
   <div class="login-loading" id="login-loading"><span class="spinner"></span>Chargement…</div>
 </div>
 
 <!-- ══ APP ═══════════════════════════════════════════════════════ -->
 <div class="app" id="app-shell" style="display:none;">
-
-  <!-- Drawer overlay -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="closeSidebar()"></div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="logo">
       <div class="logo-mark">Invest<span>Pro</span></div>
-      <div class="logo-sub">PORTEFEUILLE PRIVÉ</div>
+      <div class="logo-sub">MON ARGENT · LOMÉ</div>
     </div>
     <nav class="nav">
-      <div class="nav-section">PRINCIPAL</div>
+      <div class="nav-section">MENU PRINCIPAL</div>
       <div class="nav-item active" onclick="navigate('dashboard',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-        Tableau de bord
+        Vue d'ensemble
       </div>
       <div class="nav-item" onclick="navigate('portefeuille',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v9H2z"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/></svg>
-        Portefeuille
+        Mes placements
       </div>
       <div class="nav-item" onclick="navigate('transactions',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h12M10 5l3 3-3 3M6 11L3 8l3-3"/></svg>
-        Opérations
+        Mes mouvements d'argent
         <span class="nav-badge" id="tx-badge">0</span>
       </div>
       <div class="nav-item" onclick="navigate('historique',this)">
@@ -432,15 +410,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="nav-section">OUTILS</div>
       <div class="nav-item" onclick="navigate('calculateur',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 5h2M9 5h2M5 8h2M9 8h2M5 11h2M9 11h2"/></svg>
-        Calculateur
+        Simulateur de croissance
       </div>
       <div class="nav-item" onclick="navigate('alertes',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a5 5 0 015 5c0 3 1 4 1 4H2s1-1 1-4a5 5 0 015-5z"/><path d="M7 13h2"/></svg>
-        Alertes
+        Mes alertes de prix
       </div>
       <div class="nav-item" onclick="navigate('objectifs',this)">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>
-        Objectifs
+        Mes rêves financiers
       </div>
     </nav>
     <div class="sidebar-footer">
@@ -453,7 +431,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
       <button class="logout-btn" onclick="doLogout()">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6"/></svg>
-        Déconnexion
+        Se déconnecter
       </button>
     </div>
   </aside>
@@ -464,12 +442,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h14M2 9h14M2 14h14"/></svg>
       </button>
-      <span class="page-title" id="page-title">Tableau de bord</span>
+      <span class="page-title" id="page-title">Vue d'ensemble</span>
       <div class="live-badge"><div class="live-dot"></div>EN DIRECT</div>
     </div>
     <div class="topbar-right">
       <span class="date-tag" id="current-date"></span>
-      <button class="btn btn-sm btn-secondary" onclick="openModal()">+ Opération</button>
+      <button class="btn btn-sm btn-secondary" onclick="openModal()">+ Enregistrer</button>
       <div class="notif-btn" onclick="toggleNotif()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a5 5 0 015 5c0 3 1 4 1 4H2s1-1 1-4a5 5 0 015-5z"/><path d="M7 13h2"/></svg>
         <div class="notif-dot" id="notif-dot" style="display:none;"></div>
@@ -482,90 +460,103 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
     <!-- DASHBOARD -->
     <section class="section active" id="sec-dashboard">
+      <div class="help-banner">
+        <span class="hicon">💡</span>
+        <div>Bienvenue ! Voici un <strong>résumé de ton argent investi</strong>. 
+        Chaque chiffre s'explique en passant la souris dessus (ou en maintenant le doigt sur mobile).</div>
+      </div>
       <div class="metrics-grid">
         <div class="metric-card green">
-          <div class="metric-label">VALEUR TOTALE</div>
+          <div class="metric-label"><span class="tip" data-tip="C'est la somme de tous tes placements au prix d'aujourd'hui">VALEUR TOTALE AUJOURD'HUI ❓</span></div>
           <div class="metric-val green" id="m-total">0</div>
           <div style="font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:2px;">F CFA</div>
-          <div class="metric-trend neutral" id="m-total-trend">— actifs</div>
+          <div class="metric-trend neutral" id="m-total-trend">— placements</div>
         </div>
         <div class="metric-card cyan">
-          <div class="metric-label">DIVIDENDES REÇUS</div>
+          <div class="metric-label"><span class="tip" data-tip="Argent que tu as reçu sans rien vendre : bénéfices partagés par les entreprises">REVENUS REÇUS ❓</span></div>
           <div class="metric-val cyan" id="m-rev">0</div>
           <div style="font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:2px;">F CFA</div>
           <div class="metric-trend neutral" id="m-rev-trend">—</div>
         </div>
         <div class="metric-card amber">
-          <div class="metric-label">CAPITAL INVESTI</div>
+          <div class="metric-label"><span class="tip" data-tip="Le total de l'argent que tu as mis au départ pour acheter tes placements">ARGENT QUE TU AS MIS ❓</span></div>
           <div class="metric-val amber" id="m-investi">0</div>
           <div style="font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:2px;">F CFA</div>
-          <div class="metric-trend neutral" id="m-actifs">0 actif</div>
+          <div class="metric-trend neutral" id="m-actifs">0 placement</div>
         </div>
         <div class="metric-card purple">
-          <div class="metric-label">RENDEMENT</div>
+          <div class="metric-label"><span class="tip" data-tip="Si positif (+), tu as gagné de l'argent. Si négatif (-), tu en as perdu pour l'instant.">TON GAIN OU TA PERTE ❓</span></div>
           <div class="metric-val purple" id="m-rend">0%</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:2px;">plus/moins-value</div>
-          <div class="metric-trend neutral">vs coût d'achat</div>
+          <div style="font-size:10px;color:var(--text3);font-family:var(--fm);margin-top:2px;">par rapport à ce que tu as mis</div>
+          <div class="metric-trend neutral">vs montant investi</div>
         </div>
       </div>
       <div class="main-grid">
         <div class="card">
-          <div class="card-title">ÉVOLUTION DU PORTEFEUILLE — 6 MOIS</div>
+          <div class="card-title">ÉVOLUTION DE TON ARGENT — 6 DERNIERS MOIS</div>
           <div style="position:relative;height:200px;"><canvas id="evolChart"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-title">RÉPARTITION DES ACTIFS</div>
+          <div class="card-title">RÉPARTITION DE TES PLACEMENTS</div>
           <div class="donut-wrap" id="donut-wrap">
-            <div class="empty" style="padding:20px 0;"><div class="empty-icon">📊</div><p>Aucun actif</p></div>
+            <div class="empty" style="padding:20px 0;"><div class="empty-icon">📊</div><p>Aucun placement encore</p></div>
           </div>
         </div>
       </div>
       <div class="chart-grid">
         <div class="card">
-          <div class="card-title">REVENUS MENSUELS (F CFA)</div>
+          <div class="card-title">REVENUS REÇUS PAR MOIS (F CFA)</div>
           <div style="position:relative;height:130px;"><canvas id="revChart"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-title">DERNIÈRES OPÉRATIONS</div>
-          <div id="recent-tx"><div class="empty" style="padding:16px 0;"><div class="empty-icon">📋</div><p>Aucune opération</p></div></div>
+          <div class="card-title">DERNIERS MOUVEMENTS D'ARGENT</div>
+          <div id="recent-tx"><div class="empty" style="padding:16px 0;"><div class="empty-icon">📋</div><p>Aucun mouvement enregistré</p></div></div>
         </div>
       </div>
     </section>
 
     <!-- PORTEFEUILLE -->
     <section class="section" id="sec-portefeuille">
+      <div class="help-banner">
+        <span class="hicon">📦</span>
+        <div>Un <strong>placement</strong>, c'est de l'argent que tu as mis quelque part pour qu'il travaille pour toi : une action d'entreprise, un bon du gouvernement, un terrain…</div>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div>
-          <p style="font-size:12px;color:var(--text2);">Valeur totale</p>
+          <p style="font-size:12px;color:var(--text2);">Valeur totale de tous tes placements</p>
           <p style="font-family:var(--fh);font-size:28px;font-weight:700;color:var(--accent);" id="p-total">0 <span style="font-size:13px;color:var(--text3);font-family:var(--fm);">F CFA</span></p>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="openAddAssetModal()">+ Ajouter un actif</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddAssetModal()">+ Ajouter un placement</button>
       </div>
       <div class="card">
-        <div class="card-title">MES ACTIFS</div>
-        <div id="asset-container"><div class="empty"><div class="empty-icon">💼</div><p>Aucun actif — ajoutez votre premier actif</p></div></div>
+        <div class="card-title">MES PLACEMENTS</div>
+        <div id="asset-container"><div class="empty"><div class="empty-icon">💼</div><p>Tu n'as pas encore de placement enregistré</p><span class="empty-cta" onclick="openAddAssetModal()">+ Ajouter mon premier placement</span></div></div>
       </div>
     </section>
 
     <!-- TRANSACTIONS -->
     <section class="section" id="sec-transactions">
+      <div class="help-banner">
+        <span class="hicon">🔄</span>
+        <div>Enregistre ici chaque fois que tu <strong>achètes</strong>, <strong>vends</strong>, reçois des <strong>bénéfices</strong> d'une entreprise, ou déposes de l'argent.</div>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <p style="font-size:13px;color:var(--text2);">Entrées et sorties de capital</p>
-        <button class="btn btn-primary btn-sm" onclick="openModal()">+ Nouvelle opération</button>
+        <p style="font-size:13px;color:var(--text2);">Entrées et sorties d'argent</p>
+        <button class="btn btn-primary btn-sm" onclick="openModal()">+ Enregistrer un mouvement</button>
       </div>
       <div class="main-grid">
         <div class="card">
-          <div class="card-title">OPÉRATIONS RÉCENTES</div>
-          <div id="tx-full-list"><div class="empty"><div class="empty-icon">📋</div><p>Aucune opération</p></div></div>
+          <div class="card-title">MOUVEMENTS RÉCENTS</div>
+          <div id="tx-full-list"><div class="empty"><div class="empty-icon">📋</div><p>Aucun mouvement enregistré</p></div></div>
         </div>
         <div>
           <div class="card" style="margin-bottom:12px;">
-            <div class="card-title">RÉSUMÉ</div>
+            <div class="card-title">RÉSUMÉ DE TES MOUVEMENTS</div>
             <div class="calc-result-box" style="margin-top:0;">
-              <div class="calc-result-row"><span>Total acheté</span><span style="color:var(--red)" id="sum-buy">0 F</span></div>
-              <div class="calc-result-row"><span>Total vendu</span><span style="color:var(--accent)" id="sum-sell">0 F</span></div>
-              <div class="calc-result-row"><span>Dividendes reçus</span><span style="color:var(--amber)" id="sum-div">0 F</span></div>
-              <div class="calc-result-row"><span>Net</span><span id="sum-net" style="font-weight:600;">0 F</span></div>
+              <div class="calc-result-row"><span>💸 Total acheté</span><span style="color:var(--red)" id="sum-buy">0 F</span></div>
+              <div class="calc-result-row"><span>💰 Total vendu</span><span style="color:var(--accent)" id="sum-sell">0 F</span></div>
+              <div class="calc-result-row"><span>🎁 Bénéfices reçus</span><span style="color:var(--amber)" id="sum-div">0 F</span></div>
+              <div class="calc-result-row"><span>📊 Bilan net</span><span id="sum-net" style="font-weight:600;">0 F</span></div>
             </div>
           </div>
           <div class="card">
@@ -578,49 +569,61 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
     <!-- HISTORIQUE -->
     <section class="section" id="sec-historique">
+      <div class="help-banner">
+        <span class="hicon">🕐</span>
+        <div>Retrouve ici <strong>tout ce que tu as fait</strong> depuis le début. Tu peux filtrer par type de mouvement.</div>
+      </div>
       <div class="card">
         <div class="card-title">HISTORIQUE COMPLET</div>
         <div class="history-filters">
           <button class="filter-btn active" onclick="filterHistory('all',this)">Tout</button>
           <button class="filter-btn" onclick="filterHistory('buy',this)">Achats</button>
           <button class="filter-btn" onclick="filterHistory('sell',this)">Ventes</button>
-          <button class="filter-btn" onclick="filterHistory('div',this)">Dividendes</button>
+          <button class="filter-btn" onclick="filterHistory('div',this)">Bénéfices reçus</button>
           <button class="filter-btn" onclick="filterHistory('dep',this)">Dépôts</button>
         </div>
-        <div id="hist-container"><div class="empty"><div class="empty-icon">🕐</div><p>Aucun historique</p></div></div>
+        <div id="hist-container"><div class="empty"><div class="empty-icon">🕐</div><p>Aucun historique pour l'instant</p></div></div>
       </div>
     </section>
 
     <!-- CALCULATEUR -->
     <section class="section" id="sec-calculateur">
+      <div class="help-banner">
+        <span class="hicon">🔮</span>
+        <div>Cet outil te montre <strong>combien ton argent peut devenir</strong> si tu l'investis pendant plusieurs années. C'est la magie des <span class="tip" data-tip="Les intérêts composés, c'est quand tu gagnes des intérêts sur tes intérêts. Ex: 100F devient 108F puis 116F puis 125F...">intérêts composés ❓</span>.</div>
+      </div>
       <div class="calc-grid">
         <div class="card">
-          <div class="card-title">SIMULATEUR D'INTÉRÊTS COMPOSÉS</div>
+          <div class="card-title">SIMULATEUR — FAIS GRANDIR TON ARGENT</div>
           <div class="slider-wrap">
-            <div class="slider-label"><span>Capital initial</span><span id="sl-cap">500 000 F</span></div>
+            <div class="slider-label"><span>Argent de départ</span><span id="sl-cap">500 000 F</span></div>
+            <div class="slider-hint">Combien tu mets au départ ?</div>
             <input type="range" min="50000" max="5000000" step="50000" value="500000" id="sl-capital" oninput="calcRendement()">
           </div>
           <div class="slider-wrap">
-            <div class="slider-label"><span>Taux annuel</span><span id="sl-taux-lbl">8.0%</span></div>
+            <div class="slider-label"><span>Taux de gain annuel</span><span id="sl-taux-lbl">8.0%</span></div>
+            <div class="slider-hint">Combien ton argent rapporte chaque année ? (BRVM : souvent entre 5% et 15%)</div>
             <input type="range" min="1" max="30" step="0.5" value="8" id="sl-taux" oninput="calcRendement()">
           </div>
           <div class="slider-wrap">
             <div class="slider-label"><span>Durée</span><span id="sl-dur">5 ans</span></div>
+            <div class="slider-hint">Combien d'années tu laisses ton argent travailler ?</div>
             <input type="range" min="1" max="20" step="1" value="5" id="sl-duree" oninput="calcRendement()">
           </div>
           <div class="slider-wrap">
-            <div class="slider-label"><span>Apport mensuel</span><span id="sl-ap">0 F</span></div>
+            <div class="slider-label"><span>Ajout mensuel</span><span id="sl-ap">0 F</span></div>
+            <div class="slider-hint">Tu peux aussi ajouter un peu d'argent chaque mois</div>
             <input type="range" min="0" max="200000" step="5000" value="0" id="sl-apport" oninput="calcRendement()">
           </div>
           <div class="calc-result-box">
-            <div class="calc-result-row"><span>Valeur finale</span><span style="color:var(--accent)" id="calc-final">—</span></div>
-            <div class="calc-result-row"><span>Gain total</span><span style="color:var(--accent)" id="calc-gain">—</span></div>
-            <div class="calc-result-row"><span>Revenu annuel moyen</span><span id="calc-rev-an">—</span></div>
-            <div class="calc-result-row"><span>Multiplicateur</span><span style="color:var(--purple)" id="calc-mult">—</span></div>
+            <div class="calc-result-row"><span>💰 Tu auras au total</span><span style="color:var(--accent)" id="calc-final">—</span></div>
+            <div class="calc-result-row"><span>📈 Ton gain total</span><span style="color:var(--accent)" id="calc-gain">—</span></div>
+            <div class="calc-result-row"><span>📅 Gain moyen par an</span><span id="calc-rev-an">—</span></div>
+            <div class="calc-result-row"><span>✖️ Multiplicateur</span><span style="color:var(--purple)" id="calc-mult">—</span></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-title">COURBE DE CROISSANCE</div>
+          <div class="card-title">COURBE DE CROISSANCE DE TON ARGENT</div>
           <div style="position:relative;height:320px;"><canvas id="calcChart"></canvas></div>
         </div>
       </div>
@@ -628,17 +631,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
     <!-- ALERTES -->
     <section class="section" id="sec-alertes">
+      <div class="help-banner">
+        <span class="hicon">🔔</span>
+        <div>Une <strong>alerte</strong> te permet de noter à quel prix tu voudrais acheter ou vendre. C'est un <strong>mémo</strong> pour ne pas oublier tes objectifs de prix.</div>
+      </div>
       <div class="card" style="margin-bottom:14px;">
-        <div class="card-title">CRÉER UNE ALERTE</div>
+        <div class="card-title">CRÉER UNE ALERTE DE PRIX</div>
         <div class="form-row" style="margin-bottom:12px;">
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">ACTIF</label>
+            <label class="form-label">Sur quel placement ?</label>
             <select class="form-input" id="alert-asset">
-              <option value="">— Choisir un actif —</option>
+              <option value="">— Choisir —</option>
             </select>
           </div>
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">CONDITION</label>
+            <label class="form-label">Quand m'alerter ?</label>
             <select class="form-input" id="alert-cond">
               <option>Prix ≥ seuil</option>
               <option>Prix ≤ seuil</option>
@@ -649,7 +656,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         </div>
         <div class="form-row">
           <div class="form-group" style="margin-bottom:0;">
-            <label class="form-label">VALEUR SEUIL (F CFA)</label>
+            <label class="form-label">Prix cible (F CFA)</label>
             <input type="number" class="form-input" id="alert-val" placeholder="ex: 750000">
           </div>
           <div style="display:flex;align-items:flex-end;">
@@ -659,18 +666,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
       <div class="card">
         <div class="card-title">MES ALERTES</div>
-        <div class="alert-grid" id="alert-list"><div class="empty"><div class="empty-icon">🔔</div><p>Aucune alerte configurée</p></div></div>
+        <div class="alert-grid" id="alert-list"><div class="empty"><div class="empty-icon">🔔</div><p>Aucune alerte créée</p></div></div>
       </div>
     </section>
 
     <!-- OBJECTIFS -->
     <section class="section" id="sec-objectifs">
+      <div class="help-banner">
+        <span class="hicon">🎯</span>
+        <div>Un <strong>objectif</strong>, c'est ton rêve avec une date. Ex : "Économiser 2 millions pour acheter une moto d'ici 2026". L'app suit ta progression automatiquement.</div>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <p style="font-size:13px;color:var(--text2);">Objectifs financiers personnels</p>
+        <p style="font-size:13px;color:var(--text2);">Tes projets et rêves financiers</p>
         <button class="btn btn-primary btn-sm" onclick="openAddObjectifModal()">+ Nouvel objectif</button>
       </div>
       <div id="obj-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
-        <div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🎯</div><p>Aucun objectif — créez votre premier objectif</p></div>
+        <div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🎯</div><p>Pas encore d'objectif — créez votre premier !</p><span class="empty-cta" onclick="openAddObjectifModal()">+ Créer mon premier objectif</span></div>
       </div>
     </section>
 
@@ -686,13 +697,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </button>
     <button class="bnav-item" id="bn-portefeuille" onclick="bnavNavigate('portefeuille',this)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12v9H2z"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/></svg>
-      Portefeuille
+      Placements
     </button>
     <button class="bnav-item" onclick="openModal()">
       <div style="width:40px;height:40px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:2px;">
         <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#000" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
       </div>
-      <span style="font-size:9px;color:var(--text3);">Opération</span>
+      <span style="font-size:9px;color:var(--text3);">Enregistrer</span>
     </button>
     <button class="bnav-item" id="bn-historique" onclick="bnavNavigate('historique',this)">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
@@ -710,11 +721,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="more-drawer" id="more-drawer">
   <div class="more-item" id="md-transactions" onclick="bnavNavigate('transactions',null);toggleMoreDrawer()">
     <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h12M10 5l3 3-3 3M6 11L3 8l3-3"/></svg>
-    Opérations
+    Mouvements
   </div>
   <div class="more-item" id="md-calculateur" onclick="bnavNavigate('calculateur',null);toggleMoreDrawer()">
     <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 5h2M9 5h2M5 8h2M9 8h2M5 11h2M9 11h2"/></svg>
-    Calculateur
+    Simulateur
   </div>
   <div class="more-item" id="md-alertes" onclick="bnavNavigate('alertes',null);toggleMoreDrawer()">
     <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a5 5 0 015 5c0 3 1 4 1 4H2s1-1 1-4a5 5 0 015-5z"/><path d="M7 13h2"/></svg>
@@ -737,56 +748,59 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <!-- MODAL OPÉRATION -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div class="modal-title">Nouvelle opération</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="modal-title">Enregistrer un mouvement</div>
       <button onclick="closeModal()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;">✕</button>
     </div>
+    <div class="modal-subtitle">Quel type de mouvement veux-tu enregistrer ?</div>
     <div class="modal-tabs">
-      <div class="modal-tab active" onclick="setModalTab('buy',this)">Achat</div>
-      <div class="modal-tab" onclick="setModalTab('sell',this)">Vente</div>
-      <div class="modal-tab" onclick="setModalTab('div',this)">Dividende</div>
-      <div class="modal-tab" onclick="setModalTab('dep',this)">Dépôt</div>
+      <div class="modal-tab active" onclick="setModalTab('buy',this)">🛒 Achat</div>
+      <div class="modal-tab" onclick="setModalTab('sell',this)">💰 Vente</div>
+      <div class="modal-tab" onclick="setModalTab('div',this)">🎁 Bénéfice</div>
+      <div class="modal-tab" onclick="setModalTab('dep',this)">🏦 Dépôt</div>
     </div>
+    <div id="modal-tab-hint" style="font-size:12px;color:var(--text2);margin-bottom:14px;padding:8px 12px;background:var(--bg3);border-radius:8px;line-height:1.5;"></div>
     <div class="form-group">
-      <label class="form-label">ACTIF / SOURCE</label>
+      <label class="form-label">Sur quel placement ?</label>
       <select class="form-input" id="op-asset"><option value="">— Choisir —</option></select>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">MONTANT (F CFA)</label>
+        <label class="form-label">Montant (F CFA)</label>
         <input type="number" class="form-input" id="op-amount" placeholder="ex: 150 000">
       </div>
       <div class="form-group">
-        <label class="form-label">QUANTITÉ (optionnel)</label>
-        <input type="number" class="form-input" id="op-qty" placeholder="nb d'actions">
+        <label class="form-label">Quantité (si actions)</label>
+        <input type="number" class="form-input" id="op-qty" placeholder="ex: 5 actions">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">DATE</label>
+      <label class="form-label">Date de l'opération</label>
       <input type="date" class="form-input" id="op-date">
     </div>
     <div class="form-group">
-      <label class="form-label">NOTE</label>
-      <input type="text" class="form-input" id="op-note" placeholder="commentaire libre">
+      <label class="form-label">Note personnelle (optionnel)</label>
+      <input type="text" class="form-input" id="op-note" placeholder="ex: achat lors de la baisse de mars">
     </div>
-    <button class="btn btn-primary" id="save-op-btn" onclick="saveOperation()">Enregistrer l'opération</button>
+    <button class="btn btn-primary" id="save-op-btn" onclick="saveOperation()">✅ Enregistrer</button>
   </div>
 </div>
 
-<!-- MODAL AJOUTER ACTIF -->
+<!-- MODAL AJOUTER PLACEMENT -->
 <div class="modal-overlay" id="modal-asset">
   <div class="modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div class="modal-title">Ajouter un actif</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="modal-title">Ajouter un placement</div>
       <button onclick="closeAssetModal()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;">✕</button>
     </div>
+    <div class="modal-subtitle">Un placement = de l'argent que tu mets quelque part pour qu'il travaille.</div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">SYMBOLE (ex: ETI)</label>
+        <label class="form-label">Code court (ex: ETI pour Ecobank)</label>
         <input type="text" class="form-input" id="a-sym" placeholder="ETI" maxlength="6">
       </div>
       <div class="form-group">
-        <label class="form-label">TYPE</label>
+        <label class="form-label">Type de placement</label>
         <select class="form-input" id="a-type">
           <option>Action BRVM</option>
           <option>Obligation d'État</option>
@@ -797,65 +811,68 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">NOM COMPLET</label>
+      <label class="form-label">Nom complet</label>
       <input type="text" class="form-input" id="a-name" placeholder="ex: Ecobank Transnational">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">VALEUR ACTUELLE (F CFA)</label>
-        <input type="number" class="form-input" id="a-value" placeholder="ex: 680000">
+        <label class="form-label">Valeur actuelle (F CFA)</label>
+        <div class="form-hint">Ce que ça vaut aujourd'hui sur le marché</div>
+        <input type="number" class="form-input" id="a-value" placeholder="ex: 680 000">
       </div>
       <div class="form-group">
-        <label class="form-label">COÛT D'ACQUISITION (F CFA)</label>
-        <input type="number" class="form-input" id="a-cost" placeholder="ex: 646000">
+        <label class="form-label">Ce que tu as payé (F CFA)</label>
+        <div class="form-hint">Le prix auquel tu l'as acheté</div>
+        <input type="number" class="form-input" id="a-cost" placeholder="ex: 646 000">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">VARIATION % (ex: 5.2 ou -1.4)</label>
+        <label class="form-label">Variation % (ex: 5.2 ou -1.4)</label>
         <input type="number" class="form-input" id="a-change" placeholder="5.2" step="0.1">
       </div>
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">COULEUR</label>
+        <label class="form-label">Couleur</label>
         <input type="color" class="form-input" id="a-color" value="#60a5fa" style="height:42px;padding:4px;">
       </div>
     </div>
-    <button class="btn btn-primary" style="margin-top:16px;" id="save-asset-btn" onclick="saveAsset()">Ajouter l'actif</button>
+    <button class="btn btn-primary" style="margin-top:16px;" id="save-asset-btn" onclick="saveAsset()">✅ Ajouter ce placement</button>
   </div>
 </div>
 
 <!-- MODAL OBJECTIF -->
 <div class="modal-overlay" id="modal-obj">
   <div class="modal">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div class="modal-title">Nouvel objectif</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div class="modal-title">Créer un objectif</div>
       <button onclick="closeObjModal()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1;">✕</button>
     </div>
+    <div class="modal-subtitle">Donne un nom à ton rêve, fixe un montant et une date.</div>
     <div class="form-group">
-      <label class="form-label">NOM DE L'OBJECTIF</label>
-      <input type="text" class="form-input" id="o-name" placeholder="ex: Capital 5M FCFA">
+      <label class="form-label">Nom de l'objectif</label>
+      <input type="text" class="form-input" id="o-name" placeholder="ex: Acheter une moto, Voyage à Abidjan...">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">MONTANT CIBLE (F CFA)</label>
-        <input type="number" class="form-input" id="o-target" placeholder="ex: 5000000">
+        <label class="form-label">Montant dont tu as besoin (F CFA)</label>
+        <input type="number" class="form-input" id="o-target" placeholder="ex: 2 000 000">
       </div>
       <div class="form-group">
-        <label class="form-label">MONTANT ACTUEL (F CFA)</label>
-        <input type="number" class="form-input" id="o-current" placeholder="ex: 1000000">
+        <label class="form-label">Montant déjà de côté (F CFA)</label>
+        <input type="number" class="form-input" id="o-current" placeholder="ex: 500 000">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">DATE D'ÉCHÉANCE</label>
+        <label class="form-label">Date limite</label>
         <input type="date" class="form-input" id="o-date">
       </div>
       <div class="form-group" style="margin-bottom:0;">
-        <label class="form-label">COULEUR</label>
+        <label class="form-label">Couleur</label>
         <input type="color" class="form-input" id="o-color" value="#4ade80" style="height:42px;padding:4px;">
       </div>
     </div>
-    <button class="btn btn-primary" style="margin-top:16px;" id="save-obj-btn" onclick="saveObjectif()">Créer l'objectif</button>
+    <button class="btn btn-primary" style="margin-top:16px;" id="save-obj-btn" onclick="saveObjectif()">🎯 Créer cet objectif</button>
   </div>
 </div>
 
@@ -880,6 +897,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// ══ ONBOARDING ════════════════════════════════════════════════════
+const OB_STEPS = [
+  { icon:'👋', title:'Bienvenue sur InvestPro !', desc:'Cette application t\'aide à suivre ton argent investi, voir s\'il grandit, et atteindre tes objectifs financiers. Tout en F CFA.' },
+  { icon:'💼', title:'Qu\'est-ce qu\'un placement ?', desc:'Un placement, c\'est quand tu mets de l\'argent quelque part pour qu\'il rapporte plus : acheter des actions d\'Ecobank, placer avec l\'État, investir dans un terrain...' },
+  { icon:'📊', title:'Comment lire l\'application ?', desc:'La page "Vue d\'ensemble" montre tout d\'un coup d\'œil. Les mots avec ❓ s\'expliquent en les touchant. Rien n\'est compliqué ici.' },
+  { icon:'➕', title:'Par où commencer ?', desc:'Clique sur "Ajouter un placement" pour enregistrer ton premier investissement. Ensuite tu peux noter chaque achat ou vente.' },
+  { icon:'🚀', title:'C\'est parti !', desc:'Tu peux toujours revenir à ce guide en fermant et rouvrant l\'app. Commence maintenant — ton argent n\'attend pas !' },
+];
+let obIdx = 0;
+function renderOb() {
+  const s = OB_STEPS[obIdx];
+  document.getElementById('ob-content').innerHTML = `<div class="ob-icon">${s.icon}</div><div class="ob-title">${s.title}</div><div class="ob-desc">${s.desc}</div>`;
+  const dots = document.getElementById('ob-dots');
+  dots.innerHTML = OB_STEPS.map((_,i)=>`<div class="ob-dot${i===obIdx?' active':''}"></div>`).join('');
+  document.getElementById('ob-next').textContent = obIdx===OB_STEPS.length-1 ? 'Commencer 🚀' : 'Suivant →';
+}
+function obNext() {
+  if (obIdx < OB_STEPS.length-1) { obIdx++; renderOb(); }
+  else obSkip();
+}
+function obSkip() {
+  document.getElementById('onboarding').style.display='none';
+  localStorage.setItem('ip_ob_done','1');
+}
+
 // ══ FIREBASE CONFIG ══════════════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyDhIWe0c0ZkMbvMAi5I_U-9TJ_FNa_NRCc",
@@ -899,6 +941,13 @@ let state = { assets:[], transactions:[], alerts:[], objectifs:[], notifications
 let modalType = 'buy';
 let evolChartInst, revChartInst, fluxChartInst, calcChartInst;
 
+const TAB_HINTS = {
+  buy:  '🛒 Achat : tu as acheté des actions ou un actif. Le montant sort de ton portefeuille.',
+  sell: '💰 Vente : tu as vendu un placement. L\'argent revient dans ta poche.',
+  div:  '🎁 Bénéfice reçu (dividende) : l\'entreprise t\'a versé une part de ses profits sans que tu vendes rien.',
+  dep:  '🏦 Dépôt : tu déposes de l\'argent frais pour investir plus tard.'
+};
+
 // ══ AUTH ═════════════════════════════════════════════════════════
 auth.onAuthStateChanged(async (user) => {
   if (user) {
@@ -912,120 +961,92 @@ auth.onAuthStateChanged(async (user) => {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app-shell').style.display = 'grid';
       initApp();
+      // Onboarding pour nouveaux utilisateurs
+      if (!localStorage.getItem('ip_ob_done')) {
+        document.getElementById('onboarding').style.display='flex';
+        renderOb();
+      }
     } catch(e) {
       console.error(e);
       showLoginLoading(false);
-      showLoginError('Erreur de chargement. Vérifiez votre connexion.');
+      showLoginError('Erreur de chargement. Vérifie ta connexion internet.');
     }
   } else {
     uid = null;
     state = { assets:[], transactions:[], alerts:[], objectifs:[], notifications:[] };
     document.getElementById('login-screen').style.display = 'flex';
     document.getElementById('app-shell').style.display = 'none';
-    showLoginLoading(false);
   }
 });
 
-function showLoginLoading(s) {
-  document.getElementById('login-loading').style.display = s ? 'block' : 'none';
-  const btn = document.getElementById('login-btn');
-  btn.disabled = s;
-  btn.innerHTML = s ? '<span class="spinner"></span>Connexion…' : 'Se connecter';
-}
 function showLoginError(msg) {
   const el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.style.display = msg ? 'block' : 'none';
+  el.textContent = msg; el.style.display = 'block';
+}
+function showLoginLoading(show) {
+  document.getElementById('login-loading').style.display = show ? 'block' : 'none';
+  document.getElementById('login-btn').disabled = show;
 }
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
-  showLoginError('');
+  if (!email || !pass) { showLoginError('Remplis ton email et mot de passe.'); return; }
   showLoginLoading(true);
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-  } catch(e) {
+  document.getElementById('login-error').style.display='none';
+  try { await auth.signInWithEmailAndPassword(email, pass); }
+  catch(e) {
     showLoginLoading(false);
-    showLoginError(getAuthError(e.code));
+    const msgs = { 'auth/user-not-found':'Email inconnu — crée un compte.','auth/wrong-password':'Mot de passe incorrect.','auth/invalid-email':'Email invalide.' };
+    showLoginError(msgs[e.code] || 'Erreur de connexion. Réessaie.');
   }
 }
 async function doRegister() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
-  showLoginError('');
-  if (!email || pass.length < 6) { showLoginError('Email valide et mot de passe 6+ caractères requis.'); return; }
+  if (!email || !pass) { showLoginError('Remplis ton email et un mot de passe (6 caractères min).'); return; }
   showLoginLoading(true);
-  try {
-    await auth.createUserWithEmailAndPassword(email, pass);
-  } catch(e) {
+  document.getElementById('login-error').style.display='none';
+  try { await auth.createUserWithEmailAndPassword(email, pass); }
+  catch(e) {
     showLoginLoading(false);
-    showLoginError(getAuthError(e.code));
+    const msgs = { 'auth/email-already-in-use':'Cet email a déjà un compte — connecte-toi.','auth/weak-password':'Mot de passe trop court (6 caractères min).' };
+    showLoginError(msgs[e.code] || 'Erreur lors de la création.');
   }
 }
-async function doLogout() {
-  await auth.signOut();
-}
-function getAuthError(code) {
-  const m = {
-    'auth/user-not-found':'Aucun compte avec cet email.',
-    'auth/wrong-password':'Mot de passe incorrect.',
-    'auth/invalid-credential':'Email ou mot de passe incorrect.',
-    'auth/invalid-email':'Adresse email invalide.',
-    'auth/email-already-in-use':'Email déjà utilisé.',
-    'auth/weak-password':'Mot de passe trop faible (6 caractères min).',
-    'auth/network-request-failed':'Erreur réseau.',
-    'auth/too-many-requests':'Trop de tentatives. Réessayez plus tard.'
-  };
-  return m[code] || 'Erreur (' + code + ')';
-}
+async function doLogout() { await auth.signOut(); }
 
-// ══ FIRESTORE ════════════════════════════════════════════════════
+// ══ FIRESTORE HELPERS ═════════════════════════════════════════════
+const col = (c) => db.collection(`users/${uid}/${c}`);
+async function fsGet(c) { const s = await col(c).get(); return s.docs.map(d=>({id:d.id,...d.data()})); }
+async function fsAdd(c,data) { const r = await col(c).add(data); return r.id; }
+async function fsUpdate(c,id,data) { await col(c).doc(id).update(data); }
+async function fsDelete(c,id) { await col(c).doc(id).delete(); }
+
 async function loadUserData() {
-  const cols = ['assets','transactions','alerts','objectifs','notifications'];
-  for (const col of cols) {
-    const snap = await db.collection(`users/${uid}/${col}`).get();
-    state[col] = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-  }
-  state.transactions.sort((a,b) => (a.date||'').localeCompare(b.date||''));
-  // NOUVEAU COMPTE → tout à zéro, pas de seed
-}
-async function fsAdd(col, data) {
-  const ref = await db.collection(`users/${uid}/${col}`).add(data);
-  return ref.id;
-}
-async function fsUpdate(col, id, data) {
-  await db.collection(`users/${uid}/${col}`).doc(id).update(data);
-}
-async function fsDelete(col, id) {
-  await db.collection(`users/${uid}/${col}`).doc(id).delete();
+  const [a,t,al,o,n] = await Promise.all([fsGet('assets'),fsGet('transactions'),fsGet('alerts'),fsGet('objectifs'),fsGet('notifications')]);
+  state = { assets:a, transactions:t, alerts:al, objectifs:o, notifications:n };
 }
 
-// ══ INIT ═════════════════════════════════════════════════════════
+// ══ INIT ══════════════════════════════════════════════════════════
 function initApp() {
-  initDate();
+  document.getElementById('current-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
   renderDashboard();
   renderNotifications();
-  populateAssetSelects();
 }
 
-function initDate() {
-  const d = new Date();
-  document.getElementById('current-date').textContent =
-    d.toLocaleDateString('fr-FR', {weekday:'short',year:'numeric',month:'short',day:'numeric'}).toUpperCase();
-  document.getElementById('op-date').valueAsDate = d;
-}
-
-// ══ NAVIGATION ═══════════════════════════════════════════════════
+// ══ PAGE TITLES ═══════════════════════════════════════════════════
 const PAGE_TITLES = {
-  dashboard:'Tableau de bord', portefeuille:'Portefeuille',
-  transactions:'Opérations', historique:'Historique',
-  calculateur:'Calculateur', alertes:'Alertes', objectifs:'Objectifs'
+  dashboard:'Vue d\'ensemble', portefeuille:'Mes placements',
+  transactions:'Mouvements d\'argent', historique:'Historique',
+  calculateur:'Simulateur de croissance', alertes:'Alertes de prix',
+  objectifs:'Mes objectifs'
 };
+
 function navigate(page, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   if (el) el.classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-'+page).classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
   closeSidebar();
@@ -1038,15 +1059,11 @@ function navigate(page, el) {
   if (page==='objectifs')    renderObjectifs();
 }
 function bnavNavigate(page, el) {
-  // sync sidebar nav
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const sidebarItem = Array.from(document.querySelectorAll('.nav-item'))
-    .find(n => n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+page+"'"));
+  const sidebarItem = Array.from(document.querySelectorAll('.nav-item')).find(n => n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+page+"'"));
   if (sidebarItem) sidebarItem.classList.add('active');
-  // sync bottom nav
   document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
   if (el) el.classList.add('active');
-  // more drawer items
   ['transactions','calculateur','alertes','objectifs'].forEach(p => {
     const mi = document.getElementById('md-'+p);
     if (mi) mi.classList.toggle('active', p===page);
@@ -1054,67 +1071,47 @@ function bnavNavigate(page, el) {
   navigate(page, null);
 }
 
-// ══ SIDEBAR DRAWER (mobile) ═══════════════════════════════════════
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('drawer-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('drawer-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ══ MORE DRAWER ════════════════════════════════════════════════════
-function toggleMoreDrawer() {
-  document.getElementById('more-drawer').classList.toggle('open');
-}
+// ══ SIDEBAR ═══════════════════════════════════════════════════════
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('drawer-overlay').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('drawer-overlay').classList.remove('open'); document.body.style.overflow=''; }
+function toggleMoreDrawer() { document.getElementById('more-drawer').classList.toggle('open'); }
 document.addEventListener('click', e => {
   const drawer = document.getElementById('more-drawer');
   const btn = document.getElementById('bn-more');
-  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !btn.contains(e.target)) {
-    drawer.classList.remove('open');
-  }
+  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !btn.contains(e.target)) drawer.classList.remove('open');
 });
 
 // ══ DASHBOARD ════════════════════════════════════════════════════
 function renderDashboard() {
-  const total  = state.assets.reduce((s,a) => s+a.value, 0);
-  const cost   = state.assets.reduce((s,a) => s+a.cost,  0);
-  const pct    = cost > 0 ? ((total-cost)/cost*100).toFixed(1) : '0.0';
-  const divs   = state.transactions.filter(t => t.type==='div').reduce((s,t) => s+t.amount, 0);
-  const n      = state.assets.length;
+  const total = state.assets.reduce((s,a)=>s+a.value,0);
+  const cost  = state.assets.reduce((s,a)=>s+a.cost,0);
+  const pct   = cost>0 ? ((total-cost)/cost*100).toFixed(1) : '0.0';
+  const divs  = state.transactions.filter(t=>t.type==='div').reduce((s,t)=>s+t.amount,0);
+  const n     = state.assets.length;
 
-  document.getElementById('m-total').textContent    = total.toLocaleString('fr-FR');
-  document.getElementById('m-investi').textContent  = cost.toLocaleString('fr-FR');
-  document.getElementById('m-rev').textContent      = divs.toLocaleString('fr-FR');
-  document.getElementById('m-rend').textContent     = (parseFloat(pct)>=0?'+':'')+pct+'%';
-  document.getElementById('m-actifs').textContent   = n + (n>1?' actifs':' actif');
-  document.getElementById('m-total-trend').textContent = n + (n>1?' actifs':' actif') + ' en portefeuille';
+  document.getElementById('m-total').textContent   = total.toLocaleString('fr-FR');
+  document.getElementById('m-investi').textContent = cost.toLocaleString('fr-FR');
+  document.getElementById('m-rev').textContent     = divs.toLocaleString('fr-FR');
+  document.getElementById('m-rend').textContent    = (parseFloat(pct)>=0?'+':'')+pct+'%';
+  document.getElementById('m-actifs').textContent  = n + (n>1?' placements':' placement');
+  document.getElementById('m-total-trend').textContent = n + (n>1?' placements':' placement') + ' enregistré'+(n>1?'s':'');
+  document.getElementById('m-rev-trend').textContent   = state.transactions.filter(t=>t.type==='div').length + ' versement(s) reçu(s)';
 
-  const trend = document.getElementById('m-rend').parentElement.querySelector('.metric-trend');
+  const rendEl = document.getElementById('m-rend');
+  const trend  = rendEl.parentElement.querySelector('.metric-trend');
   if (trend) trend.className = 'metric-trend ' + (parseFloat(pct)>=0?'up':'down');
 
-  document.getElementById('m-rev-trend').textContent = state.transactions.filter(t=>t.type==='div').length + ' versement(s)';
-
-  // p-total portefeuille page
   const pt = document.getElementById('p-total');
   if (pt) pt.innerHTML = total.toLocaleString('fr-FR') + ' <span style="font-size:13px;color:var(--text3);font-family:var(--fm);">F CFA</span>';
 
-  // tx-badge
   document.getElementById('tx-badge').textContent = state.transactions.length;
   const bnBadge = document.getElementById('bn-tx-badge');
-  if (state.transactions.length > 0) { bnBadge.textContent = state.transactions.length; bnBadge.style.display='block'; }
-  else { bnBadge.style.display='none'; }
+  if (state.transactions.length>0) { bnBadge.textContent=state.transactions.length; bnBadge.style.display='block'; }
+  else bnBadge.style.display='none';
 
-  // recent tx
   const recent = state.transactions.slice(-4).reverse();
-  document.getElementById('recent-tx').innerHTML = recent.length
-    ? recent.map(txHTML).join('') 
-    : '<div class="empty" style="padding:16px 0;"><div class="empty-icon">📋</div><p>Aucune opération</p></div>';
+  document.getElementById('recent-tx').innerHTML = recent.length ? recent.map(txHTML).join('') : '<div class="empty" style="padding:16px 0;"><div class="empty-icon">📋</div><p>Aucun mouvement encore</p></div>';
 
-  // donut
   renderDonut();
   drawEvolChart();
   drawRevChart();
@@ -1123,43 +1120,28 @@ function renderDashboard() {
 
 function renderDonut() {
   const wrap = document.getElementById('donut-wrap');
-  if (!state.assets.length) {
-    wrap.innerHTML = '<div class="empty" style="padding:20px 0;"><div class="empty-icon">📊</div><p>Aucun actif</p></div>';
-    return;
-  }
-  const total = state.assets.reduce((s,a)=>s+a.value,0);
-  const types = {};
-  state.assets.forEach(a => { types[a.type] = (types[a.type]||0) + a.value; });
+  if (!state.assets.length) { wrap.innerHTML='<div class="empty" style="padding:20px 0;"><div class="empty-icon">📊</div><p>Aucun placement encore</p></div>'; return; }
+  const total   = state.assets.reduce((s,a)=>s+a.value,0);
+  const types   = {};
+  state.assets.forEach(a=>{ types[a.type]=(types[a.type]||0)+a.value; });
   const entries = Object.entries(types);
   const colors  = ['#4ade80','#a78bfa','#fbbf24','#60a5fa','#22d3ee'];
   const circumf = 2*Math.PI*35;
-  let offset = 0;
-  const slices = entries.map(([type, val], i) => {
-    const pct  = total>0 ? val/total : 0;
-    const dash = circumf*pct;
-    const gap  = circumf*(1-pct);
-    const off  = -(offset*circumf + circumf*0.25);
+  let offset    = 0;
+  const slices  = entries.map(([type,val],i)=>{
+    const pct  = total>0?val/total:0;
+    const dash = circumf*pct, gap = circumf*(1-pct);
+    const off  = -(offset*circumf+circumf*0.25);
     offset += pct;
-    return `<circle cx="50" cy="50" r="35" fill="none" stroke="${colors[i%colors.length]}" stroke-width="18"
-      stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${off}" stroke-linecap="round"/>`;
+    return `<circle cx="50" cy="50" r="35" fill="none" stroke="${colors[i%colors.length]}" stroke-width="18" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${off}" stroke-linecap="round"/>`;
   });
-  const bigPct = total>0 ? Math.round(entries[0][1]/total*100) : 0;
+  const bigPct = total>0?Math.round(entries[0][1]/total*100):0;
   const bigLbl = entries[0][0].split(' ')[0].toUpperCase();
-  const legend = entries.map(([type, val], i) => {
-    const p = total>0 ? Math.round(val/total*100) : 0;
-    return `<div class="legend-item">
-      <div class="legend-left"><span class="legend-dot" style="background:${colors[i%colors.length]}"></span>${type}</div>
-      <span class="legend-pct">${p}%</span>
-    </div>`;
+  const legend = entries.map(([type,val],i)=>{
+    const p = total>0?Math.round(val/total*100):0;
+    return `<div class="legend-item"><div class="legend-left"><span class="legend-dot" style="background:${colors[i%colors.length]}"></span>${type}</div><span class="legend-pct">${p}%</span></div>`;
   }).join('');
-  wrap.innerHTML = `
-    <svg class="donut-svg" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="35" fill="none" stroke="#1e2230" stroke-width="18"/>
-      ${slices.join('')}
-      <text x="50" y="46" text-anchor="middle" fill="#f0f2f7" font-size="14" font-family="Syne" font-weight="700">${bigPct}%</text>
-      <text x="50" y="58" text-anchor="middle" fill="#8b92a8" font-size="6" font-family="DM Mono">${bigLbl}</text>
-    </svg>
-    <div class="donut-legend">${legend}</div>`;
+  wrap.innerHTML = `<svg class="donut-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="35" fill="none" stroke="#1e2230" stroke-width="18"/>${slices.join('')}<text x="50" y="46" text-anchor="middle" fill="#f0f2f7" font-size="14" font-family="Syne" font-weight="700">${bigPct}%</text><text x="50" y="58" text-anchor="middle" fill="#8b92a8" font-size="6" font-family="DM Mono">${bigLbl}</text></svg><div class="donut-legend">${legend}</div>`;
 }
 
 // ══ CHARTS ═══════════════════════════════════════════════════════
@@ -1168,318 +1150,225 @@ const cDef = { responsive:true, maintainAspectRatio:false, plugins:{legend:{disp
 function drawEvolChart() {
   const ctx = document.getElementById('evolChart'); if (!ctx) return;
   if (evolChartInst) evolChartInst.destroy();
-  // Build from transactions
   const months = [];
   const now = new Date();
-  for (let i=5; i>=0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    months.push(d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase());
-  }
+  for (let i=5;i>=0;i--) { const d=new Date(now.getFullYear(),now.getMonth()-i,1); months.push(d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase()); }
   const total = state.assets.reduce((s,a)=>s+a.value,0);
-  // Simulate a flat line at current value if no data
-  const data = months.map((_,i) => i===5 ? total : Math.round(total*(0.92+i*0.016)));
-  evolChartInst = new Chart(ctx, {
-    type:'line',
-    data:{ labels:months, datasets:[{
-      data, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.06)',
-      tension:.4, fill:true, pointRadius:3, pointBackgroundColor:'#4ade80', borderWidth:2
-    }]},
-    options:{ ...cDef, scales:{
-      x:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4e5568',font:{size:10}} },
-      y:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'} }
-    }}
-  });
+  const data  = months.map((_,i)=>i===5?total:Math.round(total*(0.92+i*0.016)));
+  evolChartInst = new Chart(ctx,{ type:'line', data:{labels:months,datasets:[{data,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.06)',tension:.4,fill:true,pointRadius:3,pointBackgroundColor:'#4ade80',borderWidth:2}]}, options:{...cDef,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'}}}} });
 }
 
 function drawRevChart() {
   const ctx = document.getElementById('revChart'); if (!ctx) return;
   if (revChartInst) revChartInst.destroy();
-  const months = [];
-  const now = new Date();
-  for (let i=5; i>=0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-    months.push(d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase());
-  }
-  // Group dividends by month
-  const data = months.map((_,idx) => {
-    const d = new Date(now.getFullYear(), now.getMonth()-(5-idx), 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    return state.transactions.filter(t=>t.type==='div'&&t.date&&t.date.startsWith(key)).reduce((s,t)=>s+t.amount,0);
-  });
-  revChartInst = new Chart(ctx, {
-    type:'bar',
-    data:{ labels:months, datasets:[{ data, backgroundColor:'rgba(34,211,238,0.7)', borderRadius:4, borderSkipped:false }]},
-    options:{ ...cDef, scales:{
-      x:{ grid:{display:false}, ticks:{color:'#4e5568',font:{size:10}} },
-      y:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000?(v/1000)+'k':v} }
-    }}
-  });
+  const months=[];
+  const now=new Date();
+  for (let i=5;i>=0;i--) { const d=new Date(now.getFullYear(),now.getMonth()-i,1); months.push(d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase()); }
+  const divs=state.transactions.filter(t=>t.type==='div');
+  const data=months.map((_,i)=>{ const d=new Date(now.getFullYear(),now.getMonth()-(5-i),1); return divs.filter(t=>{ const td=new Date(t.date); return td.getFullYear()===d.getFullYear()&&td.getMonth()===d.getMonth(); }).reduce((s,t)=>s+t.amount,0); });
+  revChartInst = new Chart(ctx,{ type:'bar', data:{labels:months,datasets:[{data,backgroundColor:'rgba(34,211,238,0.5)',borderColor:'#22d3ee',borderWidth:1,borderRadius:3}]}, options:{...cDef,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}}} });
 }
 
-function drawFluxChart(b, s, d) {
-  const ctx = document.getElementById('fluxChart'); if (!ctx) return;
-  if (fluxChartInst) fluxChartInst.destroy();
-  fluxChartInst = new Chart(ctx, {
-    type:'doughnut',
-    data:{ labels:['Achats','Ventes','Dividendes'], datasets:[{
-      data:[b||1,s||1,d||1], backgroundColor:['#60a5fa','#4ade80','#fbbf24'], borderWidth:0
-    }]},
-    options:{ ...cDef, cutout:'60%', plugins:{legend:{display:true,position:'bottom',labels:{color:'#8b92a8',font:{size:10},boxWidth:10,padding:8}}} }
-  });
+// ══ TX HTML ═══════════════════════════════════════════════════════
+const TX_ICONS = { buy:'🛒', sell:'💰', div:'🎁', dep:'🏦' };
+const TX_LABELS = { buy:'Achat', sell:'Vente', div:'Bénéfice reçu', dep:'Dépôt' };
+function txHTML(t) {
+  const sign = t.type==='buy'?'-':'+';
+  return `<div class="tx-item">
+    <div class="tx-icon ${t.type}">${TX_ICONS[t.type]||'💳'}</div>
+    <div class="tx-info"><div class="tx-name">${t.asset||'—'}</div><div class="tx-meta">${TX_LABELS[t.type]||t.type} · ${t.note||''}</div></div>
+    <div><div class="tx-amount ${t.type}">${sign}${Number(t.amount).toLocaleString('fr-FR')} F</div><div class="tx-date">${t.date||''}</div></div>
+  </div>`;
 }
 
 // ══ ASSETS ═══════════════════════════════════════════════════════
 function renderAssets() {
-  const total = state.assets.reduce((s,a)=>s+a.value,0);
-  const pt = document.getElementById('p-total');
-  if (pt) pt.innerHTML = total.toLocaleString('fr-FR')+' <span style="font-size:13px;color:var(--text3);font-family:var(--fm);">F CFA</span>';
-
-  const container = document.getElementById('asset-container');
-  if (!state.assets.length) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">💼</div><p>Aucun actif — cliquez sur « + Ajouter un actif »</p></div>';
-    return;
-  }
-  // Desktop: table / Mobile: card-style via CSS
-  container.innerHTML = `<table class="asset-table">
-    <thead><tr><th>ACTIF</th><th>TYPE</th><th>VALEUR</th><th>VARIATION</th><th>POIDS</th><th>ACTION</th></tr></thead>
-    <tbody>${state.assets.map(a => {
-      const poids = total>0 ? Math.round(a.value/total*100) : 0;
-      const gain  = a.value - a.cost;
-      const up    = a.change >= 0;
-      return `<tr>
-        <td><div class="asset-sym">
-          <div class="sym-badge" style="background:${a.color}22;color:${a.color}">${a.sym}</div>
-          <div class="sym-name">${a.name}</div>
-        </div></td>
-        <td style="font-size:11px;color:var(--text3);font-family:var(--fm);">${a.type}</td>
-        <td>
-          <div class="price-mono">${a.value.toLocaleString('fr-FR')} F</div>
-          <div style="font-size:10px;color:${gain>=0?'var(--accent)':'var(--red)'};font-family:var(--fm);">${gain>=0?'+':''}${gain.toLocaleString('fr-FR')} F</div>
-        </td>
-        <td><span class="change-pill ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(a.change)}%</span></td>
-        <td>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div class="progress-bar"><div class="progress-fill" style="width:${poids}%;background:${a.color}"></div></div>
-            <span style="font-size:11px;font-family:var(--fm);color:var(--text2);">${poids}%</span>
-          </div>
-        </td>
-        <td><button class="btn btn-sm btn-secondary" onclick="deleteAsset('${a.id}')"
-          style="font-size:10px;padding:5px 10px;color:var(--red);border-color:rgba(248,113,113,0.2);">Retirer</button></td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>`;
+  const cont = document.getElementById('asset-container');
+  if (!state.assets.length) { cont.innerHTML='<div class="empty"><div class="empty-icon">💼</div><p>Pas encore de placement enregistré</p><span class="empty-cta" onclick="openAddAssetModal()">+ Ajouter mon premier placement</span></div>'; return; }
+  const rows = state.assets.map(a=>{
+    const gain = a.value - a.cost;
+    const pct  = a.cost>0 ? ((gain/a.cost)*100).toFixed(1) : '0.0';
+    const up   = parseFloat(pct)>=0;
+    const progW= a.cost>0?Math.min(100,Math.round(a.value/a.cost*100)):0;
+    return `<tr>
+      <td><div class="asset-sym"><div class="sym-badge" style="background:${a.color}22;color:${a.color}">${a.sym||'?'}</div><div><div class="sym-name">${a.name||'—'}</div><div style="font-size:10px;color:var(--text3);font-family:var(--fm);">${a.type||''}</div></div></div></td>
+      <td class="price-mono">${Number(a.value).toLocaleString('fr-FR')} F</td>
+      <td><span class="change-pill ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(pct)}%</span></td>
+      <td><div class="progress-bar"><div class="progress-fill" style="width:${progW}%;background:${a.color}"></div></div></td>
+      <td><button class="btn btn-sm btn-secondary" onclick="deleteAsset('${a.id}')" style="font-size:10px;padding:5px 10px;color:var(--red);border-color:rgba(248,113,113,.2);">Supprimer</button></td>
+    </tr>`;
+  }).join('');
+  cont.innerHTML = `<table class="asset-table"><thead><tr><th>PLACEMENT</th><th>VALEUR ACTUELLE</th><th>GAIN / PERTE</th><th>PROGRESSION</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-async function deleteAsset(id) {
-  if (!confirm('Retirer cet actif ?')) return;
-  await fsDelete('assets', id);
-  state.assets = state.assets.filter(a=>a.id!==id);
-  renderAssets(); renderDashboard(); populateAssetSelects();
-  showToast('Actif retiré', 'amber');
-}
-
-// ══ ADD ASSET MODAL ═══════════════════════════════════════════════
-function openAddAssetModal() { document.getElementById('modal-asset').style.display='flex'; }
+function openAddAssetModal() { populateAssetSelects(); document.getElementById('modal-asset').style.display='flex'; }
 function closeAssetModal()   { document.getElementById('modal-asset').style.display='none'; }
 
 async function saveAsset() {
-  const sym    = document.getElementById('a-sym').value.trim().toUpperCase();
-  const name   = document.getElementById('a-name').value.trim();
-  const type   = document.getElementById('a-type').value;
-  const value  = parseFloat(document.getElementById('a-value').value) || 0;
-  const cost   = parseFloat(document.getElementById('a-cost').value) || 0;
-  const change = parseFloat(document.getElementById('a-change').value) || 0;
-  const color  = document.getElementById('a-color').value;
-  if (!sym || !name || value<=0) { showToast('Remplissez symbole, nom et valeur', 'red'); return; }
+  const sym   = document.getElementById('a-sym').value.trim().toUpperCase();
+  const name  = document.getElementById('a-name').value.trim();
+  const type  = document.getElementById('a-type').value;
+  const value = parseFloat(document.getElementById('a-value').value)||0;
+  const cost  = parseFloat(document.getElementById('a-cost').value)||0;
+  const change= parseFloat(document.getElementById('a-change').value)||0;
+  const color = document.getElementById('a-color').value;
+  if (!sym||!name) { showToast('Remplis le code et le nom', 'red'); return; }
   const btn = document.getElementById('save-asset-btn');
-  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  btn.disabled=true; btn.textContent='Enregistrement…';
   try {
-    const data = { sym, name, type, value, cost, change, color };
-    const id   = await fsAdd('assets', data);
-    state.assets.push({ id, ...data });
+    const data = {sym,name,type,value,cost,change,color};
+    const id   = await fsAdd('assets',data);
+    state.assets.push({id,...data});
     closeAssetModal();
-    ['a-sym','a-name','a-value','a-cost','a-change'].forEach(id => document.getElementById(id).value='');
-    renderAssets(); renderDashboard(); populateAssetSelects();
-    showToast('Actif ajouté !', 'green');
-  } catch(e) { console.error(e); showToast('Erreur d\'enregistrement', 'red'); }
-  finally { btn.disabled=false; btn.textContent='Ajouter l\'actif'; }
+    ['a-sym','a-name','a-value','a-cost','a-change'].forEach(i=>document.getElementById(i).value='');
+    renderDashboard(); renderAssets();
+    showToast('✅ Placement ajouté !','green');
+  } catch(e) { console.error(e); showToast('Erreur — réessaie','red'); }
+  finally { btn.disabled=false; btn.textContent='✅ Ajouter ce placement'; }
 }
 
-// ══ POPULATE SELECTS ══════════════════════════════════════════════
+async function deleteAsset(id) {
+  if (!confirm('Supprimer ce placement ?')) return;
+  await fsDelete('assets',id);
+  state.assets = state.assets.filter(a=>a.id!==id);
+  renderDashboard(); renderAssets();
+  showToast('Placement supprimé','amber');
+}
+
+// ══ TRANSACTIONS ════════════════════════════════════════════════
 function populateAssetSelects() {
   const opts = state.assets.map(a=>`<option value="${a.name}">${a.name}</option>`).join('');
-  const blank = '<option value="">— Choisir —</option>';
-  document.getElementById('op-asset').innerHTML = blank + opts;
-  document.getElementById('alert-asset').innerHTML = '<option value="">— Choisir un actif —</option>' + opts;
+  ['op-asset','alert-asset'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">— Choisir —</option>'+opts; });
 }
 
-// ══ MODAL OPÉRATION ═══════════════════════════════════════════════
-function openModal()  { document.getElementById('modal').style.display='flex'; }
+function openModal() { populateAssetSelects(); setModalTab('buy', document.querySelector('.modal-tab')); document.getElementById('modal').style.display='flex'; }
 function closeModal() { document.getElementById('modal').style.display='none'; }
+
 function setModalTab(type, el) {
   modalType = type;
   document.querySelectorAll('.modal-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
+  const hint = document.getElementById('modal-tab-hint');
+  if (hint) hint.textContent = TAB_HINTS[type]||'';
 }
 
 async function saveOperation() {
   const asset  = document.getElementById('op-asset').value;
-  const amount = parseInt(document.getElementById('op-amount').value);
-  const qty    = parseInt(document.getElementById('op-qty').value) || 0;
-  const date   = document.getElementById('op-date').value;
-  const note   = document.getElementById('op-note').value;
-  if (!amount || !date) { showToast('Montant et date requis', 'red'); return; }
+  const amount = parseFloat(document.getElementById('op-amount').value)||0;
+  const qty    = parseFloat(document.getElementById('op-qty').value)||0;
+  const date   = document.getElementById('op-date').value || new Date().toISOString().slice(0,10);
+  const note   = document.getElementById('op-note').value.trim();
+  if (!asset || amount<=0) { showToast('Choisis un placement et un montant','red'); return; }
   const btn = document.getElementById('save-op-btn');
   btn.disabled=true; btn.textContent='Enregistrement…';
   try {
-    const txData = { type:modalType, asset:asset||'Divers', amount, qty, date, note };
-    const txId   = await fsAdd('transactions', txData);
-    state.transactions.push({ id:txId, ...txData });
-    state.transactions.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-    // Mise à jour actif
-    if (modalType==='buy'||modalType==='sell') {
-      const a = state.assets.find(x=>x.name===asset);
-      if (a) {
-        if (modalType==='buy')  { a.value+=amount; a.cost+=amount; }
-        if (modalType==='sell') { a.value=Math.max(0,a.value-amount); }
-        await fsUpdate('assets', a.id, { value:a.value, cost:a.cost });
-      }
-    }
-    // Notification
-    const notifData = {
-      type: modalType==='buy'?'blue':modalType==='sell'?'red':'green',
-      cat:  modalType.toUpperCase(),
-      msg:  `${asset||'Divers'} — ${amount.toLocaleString('fr-FR')} F CFA`,
-      time: "À l'instant"
-    };
-    const nid = await fsAdd('notifications', notifData);
-    state.notifications.unshift({ id:nid, ...notifData });
+    const data = {type:modalType, asset, amount, qty, date, note};
+    const id   = await fsAdd('transactions',data);
+    state.transactions.push({id,...data});
     closeModal();
-    renderDashboard(); renderNotifications();
-    document.getElementById('op-amount').value='';
-    document.getElementById('op-qty').value='';
-    document.getElementById('op-note').value='';
-    showToast('Opération enregistrée !', 'green');
-  } catch(e) { console.error(e); showToast('Erreur d\'enregistrement', 'red'); }
-  finally { btn.disabled=false; btn.textContent="Enregistrer l'opération"; }
+    ['op-amount','op-qty','op-note'].forEach(i=>document.getElementById(i).value='');
+    renderDashboard(); renderTransactions(); renderHistory('all');
+    showToast('✅ Mouvement enregistré !','green');
+  } catch(e) { console.error(e); showToast('Erreur — réessaie','red'); }
+  finally { btn.disabled=false; btn.textContent='✅ Enregistrer'; }
 }
 
-// ══ TRANSACTIONS ══════════════════════════════════════════════════
 function renderTransactions() {
-  const list = [...state.transactions].reverse();
-  document.getElementById('tx-full-list').innerHTML = list.length
-    ? list.map(txHTML).join('')
-    : '<div class="empty"><div class="empty-icon">📋</div><p>Aucune opération</p></div>';
+  const el = document.getElementById('tx-full-list');
+  el.innerHTML = state.transactions.length ? [...state.transactions].reverse().map(txHTML).join('') : '<div class="empty"><div class="empty-icon">📋</div><p>Aucun mouvement encore</p></div>';
   updateSummary();
-}
-
-function txHTML(tx) {
-  const icons  = { buy:'📈', sell:'📉', div:'💰', dep:'🏦' };
-  const labels = { buy:'Achat', sell:'Vente', div:'Dividende', dep:'Dépôt' };
-  const sign   = tx.type==='buy' ? '-' : '+';
-  return `<div class="tx-item">
-    <div class="tx-icon ${tx.type}">${icons[tx.type]||'📌'}</div>
-    <div class="tx-info">
-      <div class="tx-name">${tx.asset||'—'}</div>
-      <div class="tx-meta">${labels[tx.type]||tx.type}${tx.qty?' · '+tx.qty+' unités':''}</div>
-    </div>
-    <div>
-      <div class="tx-amount ${tx.type}">${sign}${tx.amount.toLocaleString('fr-FR')} F</div>
-      <div class="tx-date">${tx.date||''}</div>
-    </div>
-  </div>`;
+  drawFluxChart();
 }
 
 function updateSummary() {
-  const buys  = state.transactions.filter(t=>t.type==='buy').reduce((s,t)=>s+t.amount,0);
-  const sells = state.transactions.filter(t=>t.type==='sell').reduce((s,t)=>s+t.amount,0);
-  const divs  = state.transactions.filter(t=>t.type==='div').reduce((s,t)=>s+t.amount,0);
-  const net   = sells + divs - buys;
-  document.getElementById('sum-buy').textContent  = buys.toLocaleString('fr-FR')+' F';
-  document.getElementById('sum-sell').textContent = sells.toLocaleString('fr-FR')+' F';
-  document.getElementById('sum-div').textContent  = divs.toLocaleString('fr-FR')+' F';
-  const el = document.getElementById('sum-net');
-  el.textContent = (net>=0?'+':'')+net.toLocaleString('fr-FR')+' F';
-  el.style.color = net>=0?'var(--accent)':'var(--red)';
-  drawFluxChart(buys, sells, divs);
+  const buy  = state.transactions.filter(t=>t.type==='buy').reduce((s,t)=>s+t.amount,0);
+  const sell = state.transactions.filter(t=>t.type==='sell').reduce((s,t)=>s+t.amount,0);
+  const div  = state.transactions.filter(t=>t.type==='div').reduce((s,t)=>s+t.amount,0);
+  const net  = sell+div-buy;
+  document.getElementById('sum-buy').textContent  = buy.toLocaleString('fr-FR')+' F';
+  document.getElementById('sum-sell').textContent = sell.toLocaleString('fr-FR')+' F';
+  document.getElementById('sum-div').textContent  = div.toLocaleString('fr-FR')+' F';
+  const netEl = document.getElementById('sum-net');
+  netEl.textContent = (net>=0?'+':'')+net.toLocaleString('fr-FR')+' F';
+  netEl.style.color = net>=0?'var(--accent)':'var(--red)';
 }
 
-// ══ HISTORIQUE ════════════════════════════════════════════════════
-function renderHistory(filter) {
-  const list   = filter==='all' ? state.transactions : state.transactions.filter(t=>t.type===filter);
-  const labels = { buy:'ACHAT', sell:'VENTE', div:'DIVIDENDE', dep:'DÉPÔT' };
-  const colors = { buy:'var(--blue)', sell:'var(--accent)', div:'var(--amber)', dep:'var(--purple)' };
-  const container = document.getElementById('hist-container');
-  if (!list.length) {
-    container.innerHTML = '<div class="empty"><div class="empty-icon">🕐</div><p>Aucune opération</p></div>';
-    return;
-  }
-  container.innerHTML = `<table class="history-table">
-    <thead><tr><th>DATE</th><th>TYPE</th><th>ACTIF</th><th>MONTANT</th><th>QTÉ</th><th>NOTE</th></tr></thead>
-    <tbody>${[...list].reverse().map(t=>`<tr>
-      <td style="font-family:var(--fm);font-size:11px;color:var(--text3);">${t.date||'—'}</td>
-      <td><span style="font-size:9px;font-family:var(--fm);letter-spacing:.08em;color:${colors[t.type]};background:${colors[t.type]}18;padding:3px 7px;border-radius:4px;">${labels[t.type]||t.type}</span></td>
-      <td style="font-weight:500;">${t.asset||'—'}</td>
-      <td style="font-family:var(--fm);color:${t.type==='buy'?'var(--red)':'var(--accent)'};">${t.type==='buy'?'-':'+'}${t.amount.toLocaleString('fr-FR')} F</td>
-      <td style="font-family:var(--fm);color:var(--text2);">${t.qty||'—'}</td>
-      <td style="color:var(--text3);font-size:12px;">${t.note||'—'}</td>
-    </tr>`).join('')}</tbody>
-  </table>`;
+function drawFluxChart() {
+  const ctx = document.getElementById('fluxChart'); if (!ctx) return;
+  if (fluxChartInst) fluxChartInst.destroy();
+  const buy  = state.transactions.filter(t=>t.type==='buy').reduce((s,t)=>s+t.amount,0);
+  const sell = state.transactions.filter(t=>t.type==='sell').reduce((s,t)=>s+t.amount,0);
+  const div  = state.transactions.filter(t=>t.type==='div').reduce((s,t)=>s+t.amount,0);
+  const dep  = state.transactions.filter(t=>t.type==='dep').reduce((s,t)=>s+t.amount,0);
+  fluxChartInst = new Chart(ctx,{ type:'bar', data:{labels:['Achats','Ventes','Bénéfices','Dépôts'],datasets:[{data:[buy,sell,div,dep],backgroundColor:['rgba(96,165,250,.5)','rgba(74,222,128,.5)','rgba(251,191,36,.5)','rgba(167,139,250,.5)'],borderColor:['#60a5fa','#4ade80','#fbbf24','#a78bfa'],borderWidth:1,borderRadius:4}]}, options:{...cDef,scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'}}}} });
 }
-function filterHistory(type, el) {
+
+// ══ HISTORY ══════════════════════════════════════════════════════
+function renderHistory(filter) {
+  const data = filter==='all' ? state.transactions : state.transactions.filter(t=>t.type===filter);
+  const el = document.getElementById('hist-container');
+  if (!data.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🕐</div><p>Aucun mouvement de ce type</p></div>'; return; }
+  const rows = [...data].reverse().map(t=>`<tr>
+    <td>${t.date||'—'}</td>
+    <td><span class="change-pill ${t.type==='buy'?'down':'up'}">${TX_LABELS[t.type]||t.type}</span></td>
+    <td>${t.asset||'—'}</td>
+    <td class="price-mono">${Number(t.amount).toLocaleString('fr-FR')} F</td>
+    <td>${t.qty?t.qty+' unité(s)':'—'}</td>
+    <td style="color:var(--text3)">${t.note||''}</td>
+  </tr>`).join('');
+  el.innerHTML = `<table class="history-table"><thead><tr><th>DATE</th><th>TYPE</th><th>PLACEMENT</th><th>MONTANT</th><th>QTÉ</th><th>NOTE</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function filterHistory(type, btn) {
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  btn.classList.add('active');
   renderHistory(type);
 }
 
-// ══ CALCULATEUR ═══════════════════════════════════════════════════
+// ══ CALCULATEUR ══════════════════════════════════════════════════
 function calcRendement() {
-  const C = parseInt(document.getElementById('sl-capital').value);
-  const r = parseFloat(document.getElementById('sl-taux').value)/100;
-  const n = parseInt(document.getElementById('sl-duree').value);
-  const m = parseInt(document.getElementById('sl-apport').value);
-  document.getElementById('sl-cap').textContent     = C.toLocaleString('fr-FR')+' F';
-  document.getElementById('sl-taux-lbl').textContent = (r*100).toFixed(1)+'%';
-  document.getElementById('sl-dur').textContent     = n+' ans';
-  document.getElementById('sl-ap').textContent      = m.toLocaleString('fr-FR')+' F';
-  let val = C; const labels=['Départ'], data=[C];
-  for (let i=1;i<=n;i++) { val=val*(1+r)+m*12; labels.push('An '+i); data.push(Math.round(val)); }
-  const final = Math.round(val);
-  const gain  = final-C-m*12*n;
-  document.getElementById('calc-final').textContent  = final.toLocaleString('fr-FR')+' F';
-  document.getElementById('calc-gain').textContent   = '+'+gain.toLocaleString('fr-FR')+' F';
+  const C = parseFloat(document.getElementById('sl-capital').value)||0;
+  const r = parseFloat(document.getElementById('sl-taux').value)||0;
+  const n = parseInt(document.getElementById('sl-duree').value)||1;
+  const m = parseFloat(document.getElementById('sl-apport').value)||0;
+  document.getElementById('sl-cap').textContent    = C.toLocaleString('fr-FR')+' F';
+  document.getElementById('sl-taux-lbl').textContent = r.toFixed(1)+'%';
+  document.getElementById('sl-dur').textContent    = n+' an'+(n>1?'s':'');
+  document.getElementById('sl-ap').textContent     = m.toLocaleString('fr-FR')+' F';
+  const rate = r/100;
+  const fv   = C*Math.pow(1+rate,n) + (m>0 ? m*12*((Math.pow(1+rate/12,n*12)-1)/(rate/12)) : 0);
+  const invested = C + m*12*n;
+  const gain = fv - invested;
+  document.getElementById('calc-final').textContent  = Math.round(fv).toLocaleString('fr-FR')+' F';
+  document.getElementById('calc-gain').textContent   = '+'+Math.round(gain).toLocaleString('fr-FR')+' F';
   document.getElementById('calc-rev-an').textContent = Math.round(gain/n).toLocaleString('fr-FR')+' F/an';
-  document.getElementById('calc-mult').textContent   = (final/C).toFixed(2)+'x';
-  const ctx = document.getElementById('calcChart'); if (!ctx) return;
-  if (calcChartInst) calcChartInst.destroy();
-  calcChartInst = new Chart(ctx, {
-    type:'line',
-    data:{ labels, datasets:[{ data, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.06)', tension:.3, fill:true, pointRadius:2, borderWidth:2 }]},
-    options:{ ...cDef, scales:{
-      x:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4e5568',font:{size:10}} },
-      y:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'} }
-    }}
-  });
+  document.getElementById('calc-mult').textContent   = '×'+(fv/Math.max(invested,1)).toFixed(2);
+  drawCalcChart(C,r,n,m);
 }
 
-// ══ ALERTES ═══════════════════════════════════════════════════════
+function drawCalcChart(C,r,n,m) {
+  const ctx = document.getElementById('calcChart'); if (!ctx) return;
+  if (calcChartInst) calcChartInst.destroy();
+  const labels=[], dataFv=[], dataInv=[];
+  for (let i=0;i<=n;i++) {
+    labels.push(i===0?'Début':'An '+i);
+    const fv = C*Math.pow(1+r/100,i)+(m>0?m*12*((Math.pow(1+r/1200,i*12)-1)/(r/1200)):0);
+    dataFv.push(Math.round(fv));
+    dataInv.push(Math.round(C+m*12*i));
+  }
+  calcChartInst = new Chart(ctx,{ type:'line', data:{labels,datasets:[{label:'Ton argent',data:dataFv,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.08)',fill:true,tension:.4,borderWidth:2,pointRadius:2},{label:'Ce que tu mets',data:dataInv,borderColor:'#60a5fa',backgroundColor:'transparent',borderDash:[4,4],tension:.4,borderWidth:1.5,pointRadius:0}]}, options:{...cDef,plugins:{legend:{display:true,labels:{color:'#8b92a8',font:{size:10}}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4e5568',font:{size:10},callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':(v/1000).toFixed(0)+'k'}}}} });
+}
+
+// ══ ALERTES ══════════════════════════════════════════════════════
 function renderAlerts() {
   const el = document.getElementById('alert-list');
-  if (!state.alerts.length) {
-    el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Aucune alerte configurée</p></div>'; return;
-  }
+  if (!state.alerts.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Aucune alerte créée</p></div>'; return; }
   el.innerHTML = state.alerts.map(a=>`
     <div class="alert-card">
-      <div>
-        <div class="alert-sym">${a.asset}</div>
-        <div class="alert-cond">${a.cond}${a.val?' : '+Number(a.val).toLocaleString('fr-FR')+' F':''}</div>
-      </div>
+      <div><div class="alert-sym">${a.asset}</div><div class="alert-cond">${a.cond}${a.val?' : '+Number(a.val).toLocaleString('fr-FR')+' F':''}</div></div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <div class="toggle ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})">
-          <div class="toggle-thumb"></div>
-        </div>
-        <button class="btn btn-sm btn-secondary" onclick="deleteAlert('${a.id}')"
-          style="font-size:10px;padding:5px 10px;color:var(--red);border-color:rgba(248,113,113,.2);">✕</button>
+        <div class="toggle ${a.active?'on':''}" onclick="toggleAlert('${a.id}',${!a.active})"><div class="toggle-thumb"></div></div>
+        <button class="btn btn-sm btn-secondary" onclick="deleteAlert('${a.id}')" style="font-size:10px;padding:5px 10px;color:var(--red);border-color:rgba(248,113,113,.2);">✕</button>
       </div>
     </div>`).join('');
 }
@@ -1487,47 +1376,40 @@ function renderAlerts() {
 async function addAlert() {
   const asset = document.getElementById('alert-asset').value;
   const cond  = document.getElementById('alert-cond').value;
-  const val   = parseFloat(document.getElementById('alert-val').value) || 0;
-  if (!asset) { showToast('Choisissez un actif', 'red'); return; }
-  const data = { asset, cond, val, active:true };
-  const id   = await fsAdd('alerts', data);
-  state.alerts.push({ id, ...data });
+  const val   = parseFloat(document.getElementById('alert-val').value)||0;
+  if (!asset) { showToast('Choisis un placement', 'red'); return; }
+  const data = {asset,cond,val,active:true};
+  const id   = await fsAdd('alerts',data);
+  state.alerts.push({id,...data});
   document.getElementById('alert-val').value='';
   renderAlerts();
-  showToast('Alerte créée !', 'green');
+  showToast('✅ Alerte créée !','green');
 }
-async function toggleAlert(id, active) {
-  await fsUpdate('alerts', id, { active });
-  const a = state.alerts.find(x=>x.id===id);
-  if (a) a.active = active;
+async function toggleAlert(id,active) {
+  await fsUpdate('alerts',id,{active});
+  const a=state.alerts.find(x=>x.id===id); if(a) a.active=active;
   renderAlerts();
 }
 async function deleteAlert(id) {
-  await fsDelete('alerts', id);
-  state.alerts = state.alerts.filter(a=>a.id!==id);
+  await fsDelete('alerts',id);
+  state.alerts=state.alerts.filter(a=>a.id!==id);
   renderAlerts();
-  showToast('Alerte supprimée', 'amber');
+  showToast('Alerte supprimée','amber');
 }
 
 // ══ OBJECTIFS ════════════════════════════════════════════════════
 function renderObjectifs() {
   const grid = document.getElementById('obj-grid');
-  if (!state.objectifs.length) {
-    grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🎯</div><p>Aucun objectif — créez votre premier</p></div>'; return;
-  }
+  if (!state.objectifs.length) { grid.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🎯</div><p>Aucun objectif encore</p><span class="empty-cta" onclick="openAddObjectifModal()">+ Créer mon premier objectif</span></div>'; return; }
   grid.innerHTML = state.objectifs.map(o=>{
-    const pct = o.target>0 ? Math.min(100,Math.round(o.current/o.target*100)) : 0;
+    const pct = o.target>0?Math.min(100,Math.round(o.current/o.target*100)):0;
     return `<div class="obj-card">
       <div class="obj-name">${o.name}</div>
-      <div class="obj-date">Échéance : ${o.date||'—'}</div>
+      <div class="obj-date">Date limite : ${o.date||'—'}</div>
       <div class="obj-bar-bg"><div class="obj-bar-fill" style="width:${pct}%;background:${o.color}"></div></div>
-      <div class="obj-pct" style="color:${o.color}">${pct}%</div>
-      <div class="obj-amounts">
-        <span>${Number(o.current).toLocaleString('fr-FR')} F</span>
-        <span>/ ${Number(o.target).toLocaleString('fr-FR')} F</span>
-      </div>
-      <button class="btn btn-sm btn-secondary" onclick="deleteObjectif('${o.id}')"
-        style="margin-top:10px;font-size:10px;color:var(--red);border-color:rgba(248,113,113,.2);">Supprimer</button>
+      <div class="obj-pct" style="color:${o.color}">${pct}% atteint</div>
+      <div class="obj-amounts"><span>${Number(o.current).toLocaleString('fr-FR')} F économisés</span><span>/ ${Number(o.target).toLocaleString('fr-FR')} F</span></div>
+      <button class="btn btn-sm btn-secondary" onclick="deleteObjectif('${o.id}')" style="margin-top:10px;font-size:10px;color:var(--red);border-color:rgba(248,113,113,.2);">Supprimer</button>
     </div>`;
   }).join('');
 }
@@ -1537,72 +1419,63 @@ function closeObjModal()        { document.getElementById('modal-obj').style.dis
 
 async function saveObjectif() {
   const name    = document.getElementById('o-name').value.trim();
-  const target  = parseFloat(document.getElementById('o-target').value) || 0;
-  const current = parseFloat(document.getElementById('o-current').value) || 0;
+  const target  = parseFloat(document.getElementById('o-target').value)||0;
+  const current = parseFloat(document.getElementById('o-current').value)||0;
   const date    = document.getElementById('o-date').value;
   const color   = document.getElementById('o-color').value;
-  if (!name || target<=0) { showToast('Nom et montant cible requis', 'red'); return; }
+  if (!name||target<=0) { showToast('Donne un nom et un montant cible','red'); return; }
   const btn = document.getElementById('save-obj-btn');
   btn.disabled=true; btn.textContent='Enregistrement…';
   try {
-    const data = { name, target, current, date, color };
-    const id   = await fsAdd('objectifs', data);
-    state.objectifs.push({ id, ...data });
+    const data = {name,target,current,date,color};
+    const id   = await fsAdd('objectifs',data);
+    state.objectifs.push({id,...data});
     closeObjModal();
     ['o-name','o-target','o-current','o-date'].forEach(i=>document.getElementById(i).value='');
     renderObjectifs();
-    showToast('Objectif créé !', 'green');
-  } catch(e) { console.error(e); showToast('Erreur', 'red'); }
-  finally { btn.disabled=false; btn.textContent='Créer l\'objectif'; }
+    showToast('🎯 Objectif créé !','green');
+  } catch(e) { console.error(e); showToast('Erreur','red'); }
+  finally { btn.disabled=false; btn.textContent='🎯 Créer cet objectif'; }
 }
 async function deleteObjectif(id) {
   if (!confirm('Supprimer cet objectif ?')) return;
-  await fsDelete('objectifs', id);
-  state.objectifs = state.objectifs.filter(o=>o.id!==id);
+  await fsDelete('objectifs',id);
+  state.objectifs=state.objectifs.filter(o=>o.id!==id);
   renderObjectifs();
-  showToast('Objectif supprimé', 'amber');
+  showToast('Objectif supprimé','amber');
 }
 
 // ══ NOTIFICATIONS ════════════════════════════════════════════════
-function toggleNotif() {
-  document.getElementById('notif-panel').classList.toggle('open');
-}
+function toggleNotif() { document.getElementById('notif-panel').classList.toggle('open'); }
 function renderNotifications() {
-  const el = document.getElementById('notif-list');
+  const el  = document.getElementById('notif-list');
   const dot = document.getElementById('notif-dot');
-  if (!state.notifications.length) {
-    el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Aucune notification</p></div>';
-    dot.style.display='none'; return;
-  }
+  if (!state.notifications.length) { el.innerHTML='<div class="empty"><div class="empty-icon">🔔</div><p>Aucune notification</p></div>'; dot.style.display='none'; return; }
   dot.style.display='block';
   el.innerHTML = state.notifications.map(n=>`
     <div class="notif-item">
       <div class="notif-bar ${n.type}"></div>
-      <div style="flex:1;min-width:0;">
-        <div class="notif-cat">${n.cat||''}</div>
-        <div class="notif-msg">${n.msg||''}</div>
-        <div class="notif-time">${n.time||''}</div>
-      </div>
+      <div style="flex:1;min-width:0;"><div class="notif-cat">${n.cat||''}</div><div class="notif-msg">${n.msg||''}</div><div class="notif-time">${n.time||''}</div></div>
     </div>`).join('');
 }
 
 // ══ TOAST ════════════════════════════════════════════════════════
 let toastTimer;
-function showToast(msg, type) {
-  const t   = document.getElementById('toast');
-  const dot = document.getElementById('toast-dot');
-  const colors = { green:'#4ade80', red:'#f87171', amber:'#fbbf24', blue:'#60a5fa' };
-  document.getElementById('toast-msg').textContent = msg;
-  dot.style.background = colors[type]||'#fff';
+function showToast(msg,type) {
+  const t=document.getElementById('toast');
+  const dot=document.getElementById('toast-dot');
+  const colors={green:'#4ade80',red:'#f87171',amber:'#fbbf24',blue:'#60a5fa'};
+  document.getElementById('toast-msg').textContent=msg;
+  dot.style.background=colors[type]||'#fff';
   clearTimeout(toastTimer);
   t.classList.add('show');
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// ══ CLOSE MODALS ON OVERLAY CLICK ════════════════════════════════
-document.getElementById('modal').addEventListener('click', e => { if(e.target===document.getElementById('modal')) closeModal(); });
-document.getElementById('modal-asset').addEventListener('click', e => { if(e.target===document.getElementById('modal-asset')) closeAssetModal(); });
-document.getElementById('modal-obj').addEventListener('click', e => { if(e.target===document.getElementById('modal-obj')) closeObjModal(); });
+// ══ CLOSE MODALS ══════════════════════════════════════════════════
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+document.getElementById('modal-asset').addEventListener('click',e=>{if(e.target===document.getElementById('modal-asset'))closeAssetModal();});
+document.getElementById('modal-obj').addEventListener('click',e=>{if(e.target===document.getElementById('modal-obj'))closeObjModal();});
 </script>
 </body>
 </html>
