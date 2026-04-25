@@ -1,7 +1,7 @@
 {
   "appId": "com.investpro.app",
   "appName": "InvestPro",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https",
     "cleartext": true
